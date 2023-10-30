@@ -47,7 +47,7 @@ function ProductPage(): JSX.Element {
     window.scroll(0, 0);
   }, [productData, dispatch, id, errorProductData, currentTab, navigate]);
 
-  if (errorProductData) {
+  if (errorProductData || !currentTab || !id) {
     return <Page404 />;
   }
 
