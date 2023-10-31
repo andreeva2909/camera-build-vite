@@ -3,23 +3,29 @@ import { AppRoute } from '../../constants';
 import { MouseEventHandler } from 'react';
 import { useAppDispatch } from '../../hooks';
 import { setPopupAddReviewSuccess } from '../../store/products-data/products-data.slice';
+import useScroll from '../../hooks/use-scroll';
 
 function PopupAddReviewSuccess(): JSX.Element {
   const dispatch = useAppDispatch();
-  document.body.style.overflowY = 'hidden';
+  const { showScroll, hideScroll } = useScroll();
+  hideScroll();
 
   const handleCloseButton: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (event) => {
     event.preventDefault();
     dispatch(setPopupAddReviewSuccess(false));
+    showScroll();
   };
 
   const handleReturnButton: MouseEventHandler<HTMLAnchorElement> = () => {
     window.scroll(0, 0);
+    dispatch(setPopupAddReviewSuccess(false));
+    showScroll();
   };
 
   const handleKeyButton = (event: React.KeyboardEvent) => {
     if ((event.key === 'Escape') || (event.key === 'Esc')) {
       dispatch(setPopupAddReviewSuccess(false));
+      showScroll();
     }
   };
 

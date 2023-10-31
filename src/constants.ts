@@ -3,8 +3,8 @@ import { FilterCathegoryType, FilterLevelType, FilterType } from './types/filter
 export enum AppRoute {
   Main = '/',
   Product = '/product',
-  Characteristics = '/product/:id/characteristics',
-  Description = '/product/:id/description'
+  Characteristics = '/product/:id/:tab',
+  Description = '/product/:id/:tab'
 }
 
 export const FILTER_CATHEGORY : FilterCathegoryType[] = [

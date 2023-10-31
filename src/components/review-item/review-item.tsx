@@ -1,16 +1,16 @@
 import { Review } from '../../types/review';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-dayjs.extend(duration);
 import 'dayjs/locale/ru';
 import { RATINGS } from '../../constants';
-const DATE_FORMAT = 'DD MMMM';
 
 type ReviewItemProps = {
   review: Review;
 }
 
 function ReviewItem({ review }: ReviewItemProps): JSX.Element {
+  const DATE_FORMAT = 'DD MMMM';
+  dayjs.extend(duration);
   return (
     <li className="review-card" data-testid='review_item'>
       <div className="review-card__head">

@@ -2,7 +2,7 @@ import { useEffect, MouseEventHandler } from 'react';
 import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getActivePopupAddReview, getActivePopupAddReviewSuccess, getErrorProductData, getProductData } from '../../store/products-data/products-data.selectors';
+import { getActivePopupAddReview, getActivePopupAddReviewSuccess, getErrorProductData, getProductData, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import { AppRoute, RATINGS, Tab } from '../../constants';
 import Breadcrumbs from '../../components/breadcrumbs/breadcrumbs';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -12,17 +12,18 @@ import ReviewsList from '../../components/reviews-list/reviews-list';
 import Page404 from '../page-404/page-404';
 import PopupAddReview from '../../components/popup-add-review/popup-add-review';
 import PopupAddReviewSuccess from '../../components/popup-add-review-success/popup-add-review-success';
+import Loader from '../../components/loader/loader';
 
 function ProductPage(): JSX.Element {
-  const { id } = useParams();
+  const { id, tab } = useParams();
   const navigate = useNavigate();
-  const currentTab = window.location.pathname.split('/')[3];
+  const currentTab = tab;
   const dispatch = useAppDispatch();
   const productData = useAppSelector(getProductData);
   const errorProductData = useAppSelector(getErrorProductData);
   const isActivePopupAddReview = useAppSelector(getActivePopupAddReview);
   const isActivePopupAddReviewSuccess = useAppSelector(getActivePopupAddReviewSuccess);
-  document.body.style.overflowY = 'visible';
+  const isProductDataLoading = useAppSelector(getStatusLoadingProductData);
 
   const handleUpButton: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
@@ -33,7 +34,7 @@ function ProductPage(): JSX.Element {
   };
 
   useEffect(() => {
-    if (!currentTab && id) {
+    if ((!currentTab && id || ((currentTab !== Tab.Characteristics) && (currentTab !== Tab.Description) && id))) {
       navigate(`${AppRoute.Product}/${id}/${Tab.Characteristics}`);
     }
 
@@ -47,8 +48,14 @@ function ProductPage(): JSX.Element {
     window.scroll(0, 0);
   }, [productData, dispatch, id, errorProductData, currentTab, navigate]);
 
-  if (errorProductData || !currentTab || !id) {
+  if (errorProductData || !id) {
     return <Page404 />;
+  }
+
+  if (isProductDataLoading) {
+    return (
+      <Loader />
+    );
   }
 
   return (

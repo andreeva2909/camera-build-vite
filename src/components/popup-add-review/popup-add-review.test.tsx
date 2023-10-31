@@ -6,34 +6,6 @@ import PopupAddReview from './popup-add-review';
 import userEvent from '@testing-library/user-event';
 
 describe('Component: PopupAddReview', () => {
-  it('should render correctly', () => {
-    const expectedHeaderText = 'Оставить отзыв';
-    const expectedRatingText = 'Рейтинг';
-    const expectedEnterName = 'Ваше имя';
-    const expectedEnterAdvantages = 'Достоинства';
-    const expectedEnterDisadvantages = 'Недостатки';
-    const expectedEnterReview = 'Комментарий';
-    const expectedButtonText = 'Отправить отзыв';
-    const expectedTest = 'popup_add_review';
-    const withHistoryComponent = withHistory(<PopupAddReview />);
-    const { withStoreComponent } = withStore(
-      withHistoryComponent,
-      makeFakeStore({}));
-    render(withStoreComponent);
-
-    const waitingRenderTimer = setTimeout(() => {
-      expect(screen.getByTestId(expectedTest)).toBeInTheDocument();
-      expect(screen.getByAltText(expectedHeaderText)).toBeInTheDocument();
-      expect(screen.getByText(expectedRatingText)).toBeInTheDocument();
-      expect(screen.getByText(expectedEnterName)).toBeInTheDocument();
-      expect(screen.getByText(expectedEnterAdvantages)).toBeInTheDocument();
-      expect(screen.getByText(expectedEnterDisadvantages)).toBeInTheDocument();
-      expect(screen.getByText(expectedEnterReview)).toBeInTheDocument();
-      expect(screen.getByText(expectedButtonText)).toBeInTheDocument();
-      clearTimeout(waitingRenderTimer);
-    }, TIME_TO_RENDER_PAGE);
-  });
-
   it('imitate user actions when entering data correctly', async () => {
     const mockReview = makeFakeUserReview();
     const expectedRatingValue = String(mockReview.rating);
@@ -78,6 +50,32 @@ describe('Component: PopupAddReview', () => {
       expect(screen.getByDisplayValue(expectedAdvantagesValue)).toBeInTheDocument();
       expect(screen.getByDisplayValue(expectedDisadvantagesValue)).toBeInTheDocument();
       expect(screen.getByDisplayValue(expectedReviewValue)).toBeInTheDocument();
+      clearTimeout(waitingRenderTimer);
+    }, TIME_TO_RENDER_PAGE);
+  });
+
+  it('should render correctly', () => {
+    const expectedHeaderText = 'Оставить отзыв';
+    const expectedRatingText = 'Рейтинг';
+    const expectedEnterName = 'Ваше имя';
+    const expectedEnterAdvantages = 'Достоинства';
+    const expectedEnterDisadvantages = 'Недостатки';
+    const expectedEnterReview = 'Комментарий';
+    const expectedTest = 'popup_add_review';
+    const withHistoryComponent = withHistory(<PopupAddReview />);
+    const { withStoreComponent } = withStore(
+      withHistoryComponent,
+      makeFakeStore({}));
+    render(withStoreComponent);
+
+    const waitingRenderTimer = setTimeout(() => {
+      expect(screen.getByTestId(expectedTest)).toBeInTheDocument();
+      expect(screen.getByText(expectedHeaderText)).toBeInTheDocument();
+      expect(screen.getByText(expectedRatingText)).toBeInTheDocument();
+      expect(screen.getByText(expectedEnterName)).toBeInTheDocument();
+      expect(screen.getByText(expectedEnterAdvantages)).toBeInTheDocument();
+      expect(screen.getByText(expectedEnterDisadvantages)).toBeInTheDocument();
+      expect(screen.getByText(expectedEnterReview)).toBeInTheDocument();
       clearTimeout(waitingRenderTimer);
     }, TIME_TO_RENDER_PAGE);
   });

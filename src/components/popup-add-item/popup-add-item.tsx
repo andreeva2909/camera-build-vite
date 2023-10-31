@@ -2,20 +2,24 @@ import { MouseEventHandler } from 'react';
 import { setPopupAddItem } from '../../store/products-data/products-data.slice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getSelectedProductData } from '../../store/products-data/products-data.selectors';
+import useScroll from '../../hooks/use-scroll';
 
 function PopupAddItem(): JSX.Element {
   const dispatch = useAppDispatch();
+  const { showScroll, hideScroll } = useScroll();
   const selectedProductData = useAppSelector(getSelectedProductData);
-  document.body.style.overflowY = 'hidden';
+  hideScroll();
 
   const handleCloseButton: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (event) => {
     event.preventDefault();
     dispatch(setPopupAddItem(false));
+    showScroll();
   };
 
   const handleKeyButton = (event: React.KeyboardEvent) => {
     if ((event.key === 'Escape') || (event.key === 'Esc')) {
       dispatch(setPopupAddItem(false));
+      showScroll();
     }
   };
 

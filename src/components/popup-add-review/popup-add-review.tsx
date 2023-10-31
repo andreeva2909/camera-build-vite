@@ -5,13 +5,14 @@ import { UserReview } from '../../types/review';
 import { getErrorAddReview, getProductData } from '../../store/products-data/products-data.selectors';
 import { MAX_VALUE_RATING, MIN_VALUE_RATING, ReviewTextFieldLengthLimit } from '../../constants';
 import { postNewReviewAction } from '../../store/api-actions';
+import useScroll from '../../hooks/use-scroll';
 
 function PopupAddReview(): JSX.Element {
   const dispatch = useAppDispatch();
-  document.body.style.overflowY = 'hidden';
+  const { showScroll, hideScroll } = useScroll();
   const productData = useAppSelector(getProductData);
   const errorAddReview = useAppSelector(getErrorAddReview);
-
+  hideScroll();
   const ratingData = [
     { value: 5, title: 'Отлично' },
     { value: 4, title: 'Хорошо' },
@@ -32,11 +33,13 @@ function PopupAddReview(): JSX.Element {
   const handleCloseButton: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (event) => {
     event.preventDefault();
     dispatch(setPopupAddReview(false));
+    showScroll();
   };
 
   const handleKeyButton = (event: React.KeyboardEvent) => {
     if ((event.key === 'Escape') || (event.key === 'Esc')) {
       dispatch(setPopupAddReview(false));
+      showScroll();
     }
   };
 

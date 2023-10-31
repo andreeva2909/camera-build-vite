@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 import { useAppSelector } from '../../hooks';
 import { getProductData } from '../../store/products-data/products-data.selectors';
 
 function Breadcrumbs(): JSX.Element {
-  const pathname = window.location.pathname;
+  const location = useLocation();
+  const pathname = location.pathname;
   const productData = useAppSelector(getProductData);
 
   return (

@@ -2,22 +2,26 @@ import Filter from '../../components/filter/filter';
 import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import Sorting from '../../components/sorting/sorting';
-import { useAppSelector } from '../../hooks';
-import { getActivePopupAddItem, getAllProducts } from '../../store/products-data/products-data.selectors';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getActivePopupAddItem, getAllProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import ProductCardList from '../../components/product-card-list/product-card-list';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MouseEventHandler, useState, useEffect } from 'react';
 import { COUNT_PAGES_FOR_ONE_PAGE, COUNT_PRODUCTS_FOR_ONE_PAGE, DEFAULT_PAGE_NUMBER } from '../../constants';
 import PopupAddItem from '../../components/popup-add-item/popup-add-item';
 import Breadcrumbs from '../../components/breadcrumbs/breadcrumbs';
 import Banner from '../../components/banner/banner';
 import Page404 from '../page-404/page-404';
+import { fetchProductsAction, fetchProductsPromoAction } from '../../store/api-actions';
+import Loader from '../../components/loader/loader';
 
 
 function MainPage(): JSX.Element {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [searchParams] = useSearchParams();
   const allProducts = useAppSelector(getAllProducts);
-  const currentPageNumberFromURL = Number(window.location.search.split('=')[1]);
+  const currentPageNumberFromURL = Number(searchParams.get('page'));
   const [currentPageNumber, setCurrentPage] = useState(currentPageNumberFromURL ? currentPageNumberFromURL : DEFAULT_PAGE_NUMBER);
   let currentListPages = 0;
   if (currentPageNumberFromURL < COUNT_PAGES_FOR_ONE_PAGE) {
@@ -38,7 +42,16 @@ function MainPage(): JSX.Element {
     arrayPages.push(i);
   }
   const activePopupAddItem = useAppSelector(getActivePopupAddItem);
-  document.body.style.overflowY = 'visible';
+  const isProductDataLoading = useAppSelector(getStatusLoadingProductData);
+
+  useEffect(() => {
+    const needToGetData = Object.keys(allProducts).length === 0;
+
+    if (needToGetData) {
+      dispatch(fetchProductsAction());
+      dispatch(fetchProductsPromoAction());
+    }
+  }, [allProducts, dispatch]);
 
   const handlePageButton: MouseEventHandler<HTMLLIElement> = (event) => {
     event.preventDefault();
@@ -75,6 +88,12 @@ function MainPage(): JSX.Element {
 
   if (countPages !== 0 && !currentPageNumberFromURL || (countPages !== 0 && ((currentPageNumberFromURL < 0) || (currentPageNumberFromURL > countPages)))) {
     return <Page404 />;
+  }
+
+  if (isProductDataLoading) {
+    return (
+      <Loader />
+    );
   }
 
   return (
