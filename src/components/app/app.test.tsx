@@ -5,7 +5,7 @@ import { AppRoute, TIME_TO_RENDER_PAGE } from '../../constants';
 import { render, screen } from '@testing-library/react';
 import App from './app';
 import { testInitialState } from '../../store/products-data/products-data.slice';
-
+window.scrollTo = vi.fn().mockImplementation(() => null);
 describe('Application Routing', () => {
   let mockHistory: MemoryHistory;
 
@@ -46,7 +46,7 @@ describe('Application Routing', () => {
     }, TIME_TO_RENDER_PAGE);
   });
 
-  it('should render "ProductPage" when user navigate to unknown route', () => {
+  it('should render "ProductPage" when user navigate to "/product" route', () => {
     const productData = makeFakeProduct();
     const withHistoryComponent = withHistory(<App />, mockHistory);
     const { withStoreComponent } = withStore(

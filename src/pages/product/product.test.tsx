@@ -5,8 +5,9 @@ import { TIME_TO_RENDER_PAGE } from '../../constants';
 import { createMemoryHistory } from 'history';
 import { testInitialState } from '../../store/products-data/products-data.slice';
 import ProductPage from './product';
-
+window.scrollTo = vi.fn().mockImplementation(() => null);
 describe('Component: ProductPage', () => {
+
   const mockHistory = createMemoryHistory();
   const mockProduct = makeFakeProduct();
   const mockSimilarProducts = [makeFakeProduct()];

@@ -13,6 +13,7 @@ import Page404 from '../page-404/page-404';
 import PopupAddReview from '../../components/popup-add-review/popup-add-review';
 import PopupAddReviewSuccess from '../../components/popup-add-review-success/popup-add-review-success';
 import Loader from '../../components/loader/loader';
+import { scrollWindow } from '../../utils';
 
 function ProductPage(): JSX.Element {
   const { id, tab } = useParams();
@@ -27,7 +28,7 @@ function ProductPage(): JSX.Element {
 
   const handleUpButton: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    window.scroll({
+    scrollWindow({
       top: 0,
       behavior: 'smooth'
     });
@@ -45,7 +46,9 @@ function ProductPage(): JSX.Element {
       dispatch(getSimilarProductsAction(id));
       dispatch(getReviewsAction(id));
     }
-    window.scroll(0, 0);
+    scrollWindow({
+      top: 0
+    });
   }, [productData, dispatch, id, errorProductData, currentTab, navigate]);
 
   if (errorProductData || !id) {

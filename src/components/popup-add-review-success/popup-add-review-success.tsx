@@ -4,6 +4,7 @@ import { MouseEventHandler } from 'react';
 import { useAppDispatch } from '../../hooks';
 import { setPopupAddReviewSuccess } from '../../store/products-data/products-data.slice';
 import useScroll from '../../hooks/use-scroll';
+import { scrollWindow } from '../../utils';
 
 function PopupAddReviewSuccess(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -17,7 +18,9 @@ function PopupAddReviewSuccess(): JSX.Element {
   };
 
   const handleReturnButton: MouseEventHandler<HTMLAnchorElement> = () => {
-    window.scroll(0, 0);
+    scrollWindow({
+      top: 0
+    });
     dispatch(setPopupAddReviewSuccess(false));
     showScroll();
   };

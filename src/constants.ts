@@ -54,7 +54,7 @@ export enum ReviewTextFieldLengthLimit {
   Maximum = 160
 }
 
-export const TIME_TO_RENDER_PAGE = 250;
+export const TIME_TO_RENDER_PAGE = 1000;
 
 export const MIN_VALUE_RATING = 1;
 

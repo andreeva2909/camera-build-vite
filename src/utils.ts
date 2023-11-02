@@ -6,4 +6,8 @@ function sortReviews(reviewA: Review, reviewB: Review): number {
   return reviewDateB.getTime() - reviewDateA.getTime();
 }
 
-export { sortReviews };
+function scrollWindow(params : object) {
+  window.scrollTo(params);
+}
+
+export { sortReviews, scrollWindow };

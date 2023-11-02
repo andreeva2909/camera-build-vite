@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../constants';
+import { scrollWindow } from '../../utils';
 
 function Footer(): JSX.Element {
   const handleLogoClick = () => {
-    window.scroll(0, 0);
+    scrollWindow({
+      top: 0
+    });
   };
 
   return (

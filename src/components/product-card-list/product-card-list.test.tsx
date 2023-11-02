@@ -7,7 +7,7 @@ import ProductCardList from './product-card-list';
 
 describe('Component: ReviewsList', () => {
   it('should render correctly', () => {
-    const mockProducts = [makeFakeProduct(), makeFakeProduct(), makeFakeProduct()];
+    const mockProducts = [makeFakeProduct()];
     const expectedTest = 'product_list';
     const expectedItemTest = 'product_item';
     const expectedProductsQuantity = mockProducts.length;

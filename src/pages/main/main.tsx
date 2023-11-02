@@ -14,6 +14,7 @@ import Banner from '../../components/banner/banner';
 import Page404 from '../page-404/page-404';
 import { fetchProductsAction, fetchProductsPromoAction } from '../../store/api-actions';
 import Loader from '../../components/loader/loader';
+import { scrollWindow } from '../../utils';
 
 
 function MainPage(): JSX.Element {
@@ -56,7 +57,7 @@ function MainPage(): JSX.Element {
   const handlePageButton: MouseEventHandler<HTMLLIElement> = (event) => {
     event.preventDefault();
     setCurrentPage(Number(event.currentTarget.id));
-    window.scroll({
+    scrollWindow({
       top: 360,
       behavior: 'smooth'
     });
@@ -66,7 +67,7 @@ function MainPage(): JSX.Element {
     event.preventDefault();
     setListPages(listPages - COUNT_PAGES_FOR_ONE_PAGE);
     setCurrentPage(listPages);
-    window.scroll({
+    scrollWindow({
       top: 360,
       behavior: 'smooth'
     });
@@ -76,7 +77,7 @@ function MainPage(): JSX.Element {
     event.preventDefault();
     setListPages(listPages + COUNT_PAGES_FOR_ONE_PAGE);
     setCurrentPage(listPages + (COUNT_PAGES_FOR_ONE_PAGE + 1));
-    window.scroll({
+    scrollWindow({
       top: 360,
       behavior: 'smooth'
     });
