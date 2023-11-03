@@ -3,7 +3,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Product, ProductPromo } from '../types/product.ts';
 import { APIRoute } from '../constants';
 import { AppDispatch, State } from '../types/state.ts';
-import { Review, UserReview } from '../types/review.ts';
+import { Review } from '../types/review.ts';
+import { FieldValues } from 'react-hook-form';
 
 export const fetchProductsAction = createAsyncThunk<Product[], undefined, {
   dispatch: AppDispatch;
@@ -65,7 +66,7 @@ export const getReviewsAction = createAsyncThunk<Review[], string, {
   },
 );
 
-export const postNewReviewAction = createAsyncThunk<Review, UserReview, {
+export const postNewReviewAction = createAsyncThunk<Review, FieldValues, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;

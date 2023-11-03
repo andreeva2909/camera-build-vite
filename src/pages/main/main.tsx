@@ -65,8 +65,10 @@ function MainPage(): JSX.Element {
 
   const handleBackButton: MouseEventHandler<HTMLLIElement> = (event) => {
     event.preventDefault();
-    setListPages(listPages - COUNT_PAGES_FOR_ONE_PAGE);
-    setCurrentPage(listPages);
+    setCurrentPage(currentPageNumber - 1);
+    if (((currentPageNumberFromURL - 1) % COUNT_PAGES_FOR_ONE_PAGE) === 0) {
+      setListPages(listPages - COUNT_PAGES_FOR_ONE_PAGE);
+    }
     scrollWindow({
       top: 360,
       behavior: 'smooth'
@@ -75,8 +77,13 @@ function MainPage(): JSX.Element {
 
   const handleFutherButton: MouseEventHandler<HTMLLIElement> = (event) => {
     event.preventDefault();
-    setListPages(listPages + COUNT_PAGES_FOR_ONE_PAGE);
-    setCurrentPage(listPages + (COUNT_PAGES_FOR_ONE_PAGE + 1));
+    setCurrentPage(currentPageNumber + 1);
+    if ((currentPageNumberFromURL % COUNT_PAGES_FOR_ONE_PAGE) === 0) {
+      setListPages(listPages + COUNT_PAGES_FOR_ONE_PAGE);
+    }
+    if (currentPageNumberFromURL === 1) {
+      setListPages(listPages);
+    }
     scrollWindow({
       top: 360,
       behavior: 'smooth'

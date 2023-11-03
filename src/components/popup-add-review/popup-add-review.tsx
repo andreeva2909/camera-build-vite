@@ -1,15 +1,16 @@
-import React, { ChangeEvent, FormEventHandler, MouseEventHandler, useState } from 'react';
+import React, { ChangeEvent, MouseEventHandler, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { setPopupAddReview, setPopupAddReviewSuccess } from '../../store/products-data/products-data.slice';
-import { UserReview } from '../../types/review';
 import { getErrorAddReview, getProductData } from '../../store/products-data/products-data.selectors';
 import { MAX_VALUE_RATING, MIN_VALUE_RATING, ReviewTextFieldLengthLimit } from '../../constants';
 import { postNewReviewAction } from '../../store/api-actions';
 import useScroll from '../../hooks/use-scroll';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 
 function PopupAddReview(): JSX.Element {
   const dispatch = useAppDispatch();
   const { showScroll, hideScroll } = useScroll();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const productData = useAppSelector(getProductData);
   const errorAddReview = useAppSelector(getErrorAddReview);
   hideScroll();
@@ -20,15 +21,7 @@ function PopupAddReview(): JSX.Element {
     { value: 2, title: 'Плохо' },
     { value: 1, title: 'Ужасно' }
   ];
-
-  const [userReview, setUserReview] = useState<UserReview>({
-    cameraId: productData.id,
-    rating: 0,
-    userName: '',
-    advantage: '',
-    disadvantage: '',
-    review: ''
-  });
+  const [userRating, setUserRating] = useState(0);
 
   const handleCloseButton: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (event) => {
     event.preventDefault();
@@ -45,59 +38,19 @@ function PopupAddReview(): JSX.Element {
 
   const handleRatingChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     const value = Number(target.value);
-    setUserReview({
-      ...userReview,
-      rating: value
-    });
+    setUserRating(value);
   };
 
-  const handleUserNameChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
-    const value = target.value;
-    setUserReview({
-      ...userReview,
-      userName: value
-    });
-  };
 
-  const handleAdvantagesChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
-    const value = target.value;
-    setUserReview({
-      ...userReview,
-      advantage: value
-    });
-  };
-
-  const handleDisadvantagesChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
-    const value = target.value;
-    setUserReview({
-      ...userReview,
-      disadvantage: value
-    });
-  };
-
-  const handleCommentChange = ({ target }: ChangeEvent<HTMLTextAreaElement>) => {
-    const value = target.value;
-    setUserReview({
-      ...userReview,
-      review: value
-    });
-  };
-
-  const checkRatingValue = (userReview.rating >= MIN_VALUE_RATING) && (userReview.rating <= MAX_VALUE_RATING);
-  const checkUserNameInputField = userReview.userName.length >= ReviewTextFieldLengthLimit.Minimum && userReview.userName.length <= ReviewTextFieldLengthLimit.Maximum;
-  const checkAdvantageInputField = userReview.advantage.length >= ReviewTextFieldLengthLimit.Minimum && userReview.userName.length <= ReviewTextFieldLengthLimit.Maximum;
-  const checkDisdvantageInputField = userReview.disadvantage.length >= ReviewTextFieldLengthLimit.Minimum && userReview.userName.length <= ReviewTextFieldLengthLimit.Maximum;
-  const checkReviewInputField = userReview.review.length >= ReviewTextFieldLengthLimit.Minimum && userReview.userName.length <= ReviewTextFieldLengthLimit.Maximum;
-  const checkAllFields = checkRatingValue && checkUserNameInputField && checkAdvantageInputField && checkDisdvantageInputField && checkReviewInputField;
-
-  const handleReviewFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    if (checkAllFields) {
-      dispatch(postNewReviewAction(userReview));
-      if (!errorAddReview) {
-        dispatch(setPopupAddReview(false));
-        dispatch(setPopupAddReviewSuccess(true));
-      }
+  const handleReviewFormSubmit: SubmitHandler<FieldValues> = (data) => {
+    const { rating } = data;
+    const convertedRating = Number(rating);
+    data.rating = convertedRating;
+    data.cameraId = productData.id;
+    dispatch(postNewReviewAction(data));
+    if (!errorAddReview) {
+      dispatch(setPopupAddReview(false));
+      dispatch(setPopupAddReviewSuccess(true));
     }
   };
 
@@ -108,7 +61,10 @@ function PopupAddReview(): JSX.Element {
         <div className="modal__content">
           <p className="title title--h4">Оставить отзыв</p>
           <div className="form-review">
-            <form method="post" onSubmit={handleReviewFormSubmit}>
+            <form method="post"
+              onSubmit={(event) =>
+                void handleSubmit(handleReviewFormSubmit)(event)}
+            >
               <div className="form-review__rate">
                 <fieldset className="rate form-review__item is-invalid">
                   <legend className="rate__caption">
@@ -124,11 +80,16 @@ function PopupAddReview(): JSX.Element {
                           <input
                             className="visually-hidden"
                             id={`star-${rating.value}`}
-                            name="rate"
                             type="radio"
                             defaultValue={rating.value}
-                            onChange={handleRatingChange}
                             data-testid={`rating_${rating.value}_value`}
+                            {...register('rating', {
+                              required: true,
+                              minLength: MIN_VALUE_RATING,
+                              maxLength: MAX_VALUE_RATING,
+                            })}
+                            onChange={handleRatingChange}
+                            aria-invalid={errors.rate ? 'true' : 'false'}
                           />
                           <label
                             className="rate__label"
@@ -139,14 +100,14 @@ function PopupAddReview(): JSX.Element {
                       ))}
                     </div>
                     <div className="rate__progress">
-                      <span className="rate__stars">{userReview.rating}</span> <span>/</span>{' '}
+                      <span className="rate__stars">{userRating}</span> <span>/</span>{' '}
                       <span className="rate__all-stars">5</span>
                     </div>
                   </div>
-                  {!checkRatingValue &&
-                  <p className="rate__message">Нужно оценить товар</p>}
+                  {(errors.rating && userRating === 0) &&
+                    <p className="rate__message">Нужно оценить товар</p>}
                 </fieldset>
-                <div className={`custom-input form-review__item ${!checkUserNameInputField ? 'is-invalid' : ''}`}>
+                <div className={`custom-input form-review__item ${errors.userName ? 'is-invalid' : ''}`}>
                   <label>
                     <span className="custom-input__label">
                       Ваше имя
@@ -156,19 +117,25 @@ function PopupAddReview(): JSX.Element {
                     </span>
                     <input
                       type="text"
-                      name="user-name"
                       placeholder="Введите ваше имя"
-                      required
                       autoFocus
-                      onChange={handleUserNameChange}
-                      minLength={ReviewTextFieldLengthLimit.Minimum}
-                      maxLength={ReviewTextFieldLengthLimit.Maximum}
                       data-testid='username_value'
+                      {...register('userName', {
+                        required: true,
+                        minLength: ReviewTextFieldLengthLimit.Minimum,
+                        maxLength: ReviewTextFieldLengthLimit.Maximum,
+                      })}
+                      aria-invalid={errors.userName ? 'true' : 'false'}
                     />
                   </label>
-                  {!checkUserNameInputField && <p className="custom-input__error">(от {ReviewTextFieldLengthLimit.Minimum} до {ReviewTextFieldLengthLimit.Maximum} символов)</p>}
+                  {errors.userName?.type === 'required' &&
+                    <><br /><p className="custom-input__error">Нужно указать имя</p></>}
+                  {errors.userName?.type === 'minLength' &&
+                    <><br /><p className="custom-input__error">Миниальное количество символов {ReviewTextFieldLengthLimit.Minimum}</p></>}
+                  {errors.userName?.type === 'maxLength' &&
+                    <><br /><p className="custom-input__error">Максимальное количество символов {ReviewTextFieldLengthLimit.Maximum}</p></>}
                 </div>
-                <div className={`custom-input form-review__item ${!checkAdvantageInputField ? 'is-invalid' : ''}`}>
+                <div className={`custom-input form-review__item ${errors.advantage ? 'is-invalid' : ''}`}>
                   <label>
                     <span className="custom-input__label">
                       Достоинства
@@ -178,18 +145,24 @@ function PopupAddReview(): JSX.Element {
                     </span>
                     <input
                       type="text"
-                      name="user-plus"
                       placeholder="Основные преимущества товара"
-                      required
-                      onChange={handleAdvantagesChange}
-                      minLength={ReviewTextFieldLengthLimit.Minimum}
-                      maxLength={ReviewTextFieldLengthLimit.Maximum}
                       data-testid='advantage_value'
+                      {...register('advantage', {
+                        required: true,
+                        minLength: ReviewTextFieldLengthLimit.Minimum,
+                        maxLength: ReviewTextFieldLengthLimit.Maximum,
+                      })}
+                      aria-invalid={errors.advantage ? 'true' : 'false'}
                     />
                   </label>
-                  {!checkAdvantageInputField && <p className="custom-input__error">(от {ReviewTextFieldLengthLimit.Minimum} до {ReviewTextFieldLengthLimit.Maximum} символов)</p>}
+                  {errors.advantage?.type === 'required' &&
+                    <><br /><p className="custom-input__error">Нужно указать достоинства</p></>}
+                  {errors.advantage?.type === 'minLength' &&
+                    <><br /><p className="custom-input__error">Миниальное количество символов {ReviewTextFieldLengthLimit.Minimum}</p></>}
+                  {errors.advantage?.type === 'maxLength' &&
+                    <><br /><p className="custom-input__error">Максимальное количество символов {ReviewTextFieldLengthLimit.Maximum}</p></>}
                 </div>
-                <div className={`custom-input form-review__item ${!checkDisdvantageInputField ? 'is-invalid' : ''}`}>
+                <div className={`custom-input form-review__item ${errors.disadvantage ? 'is-invalid' : ''}`}>
                   <label>
                     <span className="custom-input__label">
                       Недостатки
@@ -199,18 +172,24 @@ function PopupAddReview(): JSX.Element {
                     </span>
                     <input
                       type="text"
-                      name="user-minus"
                       placeholder="Главные недостатки товара"
-                      required
-                      onChange={handleDisadvantagesChange}
-                      minLength={ReviewTextFieldLengthLimit.Minimum}
-                      maxLength={ReviewTextFieldLengthLimit.Maximum}
                       data-testid='disadvantage_value'
+                      {...register('disadvantage', {
+                        required: true,
+                        minLength: ReviewTextFieldLengthLimit.Minimum,
+                        maxLength: ReviewTextFieldLengthLimit.Maximum,
+                      })}
+                      aria-invalid={errors.disadvantage ? 'true' : 'false'}
                     />
                   </label>
-                  {!checkDisdvantageInputField && <p className="custom-input__error">(от {ReviewTextFieldLengthLimit.Minimum} до {ReviewTextFieldLengthLimit.Maximum} символов)</p>}
+                  {errors.disadvantage?.type === 'required' &&
+                    <><br /><p className="custom-input__error">Нужно указать недостатки</p></>}
+                  {errors.disadvantage?.type === 'minLength' &&
+                    <><br /><p className="custom-input__error">Миниальное количество символов {ReviewTextFieldLengthLimit.Minimum}</p></>}
+                  {errors.disadvantage?.type === 'maxLength' &&
+                    <><br /><p className="custom-input__error">Максимальное количество символов {ReviewTextFieldLengthLimit.Maximum}</p></>}
                 </div>
-                <div className={`custom-textarea form-review__item ${!checkReviewInputField ? 'is-invalid' : ''}`}>
+                <div className={`custom-textarea form-review__item ${errors.review ? 'is-invalid' : ''}`}>
                   <label>
                     <span className="custom-textarea__label">
                       Комментарий
@@ -219,22 +198,26 @@ function PopupAddReview(): JSX.Element {
                       </svg>
                     </span>
                     <textarea
-                      name="user-comment"
                       placeholder="Поделитесь своим опытом покупки"
                       defaultValue={''}
-                      onChange={handleCommentChange}
-                      minLength={ReviewTextFieldLengthLimit.Minimum}
-                      maxLength={ReviewTextFieldLengthLimit.Maximum}
                       data-testid='review_value'
+                      {...register('review', {
+                        required: true,
+                        minLength: ReviewTextFieldLengthLimit.Minimum,
+                        maxLength: ReviewTextFieldLengthLimit.Maximum,
+                      })}
+                      aria-invalid={errors.review ? 'true' : 'false'}
                     />
                   </label>
-                  {!checkReviewInputField &&
-                  <div className="custom-textarea__error">
-                    (от {ReviewTextFieldLengthLimit.Minimum} до {ReviewTextFieldLengthLimit.Maximum} символов)
-                  </div>}
+                  {errors.review?.type === 'required' &&
+                    <><br /><div className="custom-input__error">Нужно добавить комментарий</div></>}
+                  {errors.review?.type === 'minLength' &&
+                    <><br /><div className="custom-input__error">Миниальное количество символов {ReviewTextFieldLengthLimit.Minimum}</div></>}
+                  {errors.review?.type === 'maxLength' &&
+                    <><br /><div className="custom-input__error">Максимальное количество символов {ReviewTextFieldLengthLimit.Maximum}</div></>}
                 </div>
               </div>
-              <button className="btn btn--purple form-review__btn" type="submit" disabled={!checkAllFields}>
+              <button className="btn btn--purple form-review__btn" type="submit">
                 Отправить отзыв
               </button>
             </form>

@@ -2,7 +2,7 @@ import { useEffect, MouseEventHandler } from 'react';
 import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getActivePopupAddReview, getActivePopupAddReviewSuccess, getErrorProductData, getProductData, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
+import { getActivePopupAddReview, getActivePopupAddReviewSuccess, getErrorProductData, getProductData, getProductReviews, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import { AppRoute, RATINGS, Tab } from '../../constants';
 import Breadcrumbs from '../../components/breadcrumbs/breadcrumbs';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -21,6 +21,7 @@ function ProductPage(): JSX.Element {
   const currentTab = tab;
   const dispatch = useAppDispatch();
   const productData = useAppSelector(getProductData);
+  const productReviewsCount = useAppSelector(getProductReviews).length;
   const errorProductData = useAppSelector(getErrorProductData);
   const isActivePopupAddReview = useAppSelector(getActivePopupAddReview);
   const isActivePopupAddReviewSuccess = useAppSelector(getActivePopupAddReviewSuccess);
@@ -95,7 +96,7 @@ function ProductPage(): JSX.Element {
                     ))}
                     <p className="visually-hidden">Рейтинг: {productData.rating}</p>
                     <p className="rate__count">
-                      <span className="visually-hidden">Всего оценок:</span>{productData.reviewCount}
+                      <span className="visually-hidden">Всего оценок:</span>{productReviewsCount}
                     </p>
                   </div>
                   <p className="product__price">

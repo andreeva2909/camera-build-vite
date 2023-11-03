@@ -12,7 +12,15 @@
 
 .swiper-button-disabled {
   color: #ddd;
-  background-color: #E8E8E8;
+  background-color: #f8f8f8;
+  pointer-events: none;
+  cursor: default;
+}
+
+.swiper-button-disabled:hover {
+  color: #ddd;
+  cursor: default;
+  background-color: #f8f8f8;
   pointer-events: none;
 }
 

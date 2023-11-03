@@ -85,6 +85,11 @@ export const productsData = createSlice({
       .addCase(postNewReviewAction.fulfilled, (state, action) => {
         state.errorAddReview = false;
         state.productReviews.push(action.payload);
+        state.products.map((product) => {
+          if (product.id === action.payload.cameraId) {
+            product.reviewCount++;
+          }
+        });
       })
       .addCase(postNewReviewAction.rejected, (state) => {
         state.errorAddReview = true;
