@@ -3,7 +3,7 @@ import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import Sorting from '../../components/sorting/sorting';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getActivePopupAddItem, getAllProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
+import { getActivePopupAddItem, getAllProducts, getCurrentFilterCathegory, getCurrentFilterType, getCurrentSortingDirection, getCurrentSortingType, getFilteredProductsByCathegory, getFilteredProductsByType, getSortedProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import ProductCardList from '../../components/product-card-list/product-card-list';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MouseEventHandler, useState, useEffect } from 'react';
@@ -22,8 +22,16 @@ function MainPage(): JSX.Element {
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
   const allProducts = useAppSelector(getAllProducts);
+  const sortedProducts = useAppSelector(getSortedProducts) || allProducts;
+  const filteredProductsByCathegory = useAppSelector(getFilteredProductsByCathegory) || sortedProducts;
+  const filteredProductsByType = useAppSelector(getFilteredProductsByType) || filteredProductsByCathegory;
   const currentPageNumberFromURL = Number(searchParams.get('page'));
   const [currentPageNumber, setCurrentPage] = useState(currentPageNumberFromURL ? currentPageNumberFromURL : DEFAULT_PAGE_NUMBER);
+  const currentSortingType = useAppSelector(getCurrentSortingType);
+  const currentSortingDirection = useAppSelector(getCurrentSortingDirection);
+  const currentFilterCathegory = useAppSelector(getCurrentFilterCathegory);
+  const currentFilterType = useAppSelector(getCurrentFilterType);
+
   let currentListPages = 0;
   if (currentPageNumberFromURL < COUNT_PAGES_FOR_ONE_PAGE) {
     currentListPages = 0;
@@ -36,8 +44,8 @@ function MainPage(): JSX.Element {
     }
   }
   const [listPages, setListPages] = useState(currentListPages);
-  const currentProducts = allProducts.slice(((currentPageNumberFromURL - 1) * COUNT_PRODUCTS_FOR_ONE_PAGE), (currentPageNumberFromURL * COUNT_PRODUCTS_FOR_ONE_PAGE));
-  const countPages = Math.ceil(allProducts.length / COUNT_PRODUCTS_FOR_ONE_PAGE);
+  const currentProducts = filteredProductsByType.slice(((currentPageNumberFromURL - 1) * COUNT_PRODUCTS_FOR_ONE_PAGE), (currentPageNumberFromURL * COUNT_PRODUCTS_FOR_ONE_PAGE));
+  const countPages = Math.ceil(filteredProductsByType.length / COUNT_PRODUCTS_FOR_ONE_PAGE);
   const arrayPages = [];
   for (let i = DEFAULT_PAGE_NUMBER; i < countPages + DEFAULT_PAGE_NUMBER; i++) {
     arrayPages.push(i);
@@ -91,8 +99,8 @@ function MainPage(): JSX.Element {
   };
 
   useEffect(() => {
-    navigate(`?page=${currentPageNumber}`);
-  }, [currentPageNumber, navigate]);
+    navigate(`?page=${currentPageNumber}&sortType=${currentSortingType}&sortDirection=${currentSortingDirection}&category=${currentFilterCathegory}&types=${currentFilterType.join(',')}`);
+  }, [currentFilterCathegory, currentFilterType, currentPageNumber, currentSortingDirection, currentSortingType, navigate]);
 
   if (countPages !== 0 && !currentPageNumberFromURL || (countPages !== 0 && ((currentPageNumberFromURL < 0) || (currentPageNumberFromURL > countPages)))) {
     return <Page404 />;

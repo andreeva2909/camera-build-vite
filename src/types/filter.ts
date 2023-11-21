@@ -1,24 +1,24 @@
-export type NameCathegoryEng = 'photocamera' | 'videocamera';
+export type NameCathegoryEng = 'photocamera' | 'videocamera' | 'none' | 'null';
 
-export type NameCathegoryRu = 'Фотоаппарат' | 'Фотокамера' | 'Видеокамера';
+export type NameCathegoryRu = 'Фотоаппарат' | 'Фотокамера' | 'Видеокамера' | 'none' | 'null';
 
 export type FilterCathegoryType = {
   nameEng: NameCathegoryEng;
   nameRu: NameCathegoryRu;
 };
 
-export type NameTypeEng = 'digital' | 'film' | 'snapshot' | 'collection';
+export type NameTypeEng = 'digital' | 'film' | 'snapshot' | 'collection' | 'none' | 'null';
 
-export type NameTypeRu = 'Цифровая' | 'Плёночная' | 'Моментальная' | 'Коллекционная';
+export type NameTypeRu = 'Цифровая' | 'Плёночная' | 'Моментальная' | 'Коллекционная' | 'none' | 'null';
 
 export type FilterType = {
   nameEng: NameTypeEng;
   nameRu: NameTypeRu;
 };
 
-export type NameLevelEng = 'zero' | 'non-professional' | 'professional';
+export type NameLevelEng = 'zero' | 'non-professional' | 'professional' | 'none' | 'null' ;
 
-export type NameLevelRu = 'Нулевой' | 'Любительский' | 'Профессиональный';
+export type NameLevelRu = 'Нулевой' | 'Любительский' | 'Профессиональный' | 'none' | 'null';
 
 export type FilterLevelType = {
   nameEng: NameLevelEng;

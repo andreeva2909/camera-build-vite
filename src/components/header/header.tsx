@@ -1,7 +1,132 @@
-import { Link } from 'react-router-dom';
-import { AppRoute } from '../../constants';
+import { Link, useNavigate } from 'react-router-dom';
+import { AppRoute, Tab } from '../../constants';
+import { ChangeEventHandler, MouseEventHandler, useState, useRef } from 'react';
+import { useAppSelector } from '../../hooks';
+import { getAllProducts } from '../../store/products-data/products-data.selectors';
+import { Product } from '../../types/product';
 
 function Header(): JSX.Element {
+  const allProducts = useAppSelector(getAllProducts);
+  const [searchProducts, setSearchProducts] = useState([] as Product[]);
+  const [viewSearch, setViewSearch] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [counter, setCounter] = useState(0);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const productListRef = useRef<HTMLUListElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const navigate = useNavigate();
+
+  const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (event) => {
+    event.preventDefault();
+    const currentProducts = [] as Product[];
+    setSearchProducts([]);
+    setSearchText(event.currentTarget.value);
+    if (event.currentTarget.value.length >= 3) {
+      setViewSearch(true);
+      allProducts.map((product) => {
+        if (product.name.toLowerCase().includes(String(event.currentTarget.value.toLowerCase())) ||
+          (product.name.toLowerCase().includes(String(event.currentTarget.value.split(' ').reverse().join(' ').toLowerCase()))) ||
+          (product.name.split(' ').reverse().join(' ').toLowerCase().includes(String(event.currentTarget.value.toLowerCase()))) ||
+          (product.name.split(' ').reverse().join('').toLowerCase().includes(String(event.currentTarget.value.toLowerCase()))) ||
+          (product.name.toLowerCase().split(' ').join('').includes(String(event.currentTarget.value.toLowerCase()))) ||
+          (product.name.toLowerCase().split(' ').sort().join('').includes(String(event.currentTarget.value.toLowerCase().split(' ').sort().join(''))))) {
+          if (!(searchProducts.find((currentProduct) => currentProduct.name.toLowerCase() === product.name.toLowerCase()))) {
+            currentProducts.push(product);
+          }
+        } else {
+          const deleteProductIndex = searchProducts.indexOf(product);
+          if (deleteProductIndex !== -1) {
+            searchProducts.splice(deleteProductIndex, 1);
+          }
+        }
+      });
+      setSearchProducts([...searchProducts, ...currentProducts]);
+    }
+    if (event.currentTarget.value.length < 3) {
+      setSearchProducts([]);
+      setViewSearch(false);
+    }
+  };
+
+  const handleResetSearchButton: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    if (inputRef.current?.value) {
+      inputRef.current.value = '';
+      inputRef.current.focus();
+    }
+    setSearchProducts([]);
+    setViewSearch(false);
+    setCounter(0);
+  };
+
+  const handleProductClick: MouseEventHandler<HTMLLIElement> = (event) => {
+    event.preventDefault();
+    navigate(`${AppRoute.Product}/${String(event.currentTarget.id)}/${Tab.Characteristics}`);
+  };
+
+  const handleKeyProductButton = (event: React.KeyboardEvent) => {
+    if ((event.key === 'Enter') || (event.key === 'Ent')) {
+      event.preventDefault();
+      navigate(`${AppRoute.Product}/${String(event.currentTarget.id)}/${Tab.Characteristics}`);
+    }
+  };
+
+  const handleKeyFormButton = (event: React.KeyboardEvent) => {
+    setCounter(0);
+    const focusableElementsString = '[tabindex="0"]';
+    const focusableElements: NodeListOf<Element> | undefined = formRef.current?.querySelectorAll(focusableElementsString);
+    const focusElements: HTMLUListElement[] | undefined = Array.prototype.slice.call(focusableElements);
+    const firstTabStop = focusElements[0];
+    const lastTabStop = focusElements[focusElements.length - 1];
+    if (event.key === 'Tab') {
+      if (searchProducts.length === 1) {
+        setCounter(0);
+      }
+      setCounter(counter + 1);
+      if (document.activeElement === lastTabStop) {
+        firstTabStop.focus();
+        setCounter(1);
+      }
+    }
+    if (event.key === 'ArrowDown') {
+      if (searchProducts.length === 1) {
+        event.preventDefault();
+        focusElements[1].focus();
+        setCounter(0);
+      }
+      if (searchProducts.length > 1) {
+        event.preventDefault();
+        focusElements[counter + 1].focus();
+        setCounter(counter + 1);
+        if (document.activeElement === firstTabStop) {
+          setCounter(0);
+        }
+        if (document.activeElement === lastTabStop) {
+          setCounter(0);
+        }
+      }
+    }
+    if (event.key === 'ArrowUp') {
+      if (searchProducts.length === 1) {
+        setCounter(0);
+      }
+      if (counter <= 0) {
+        event.preventDefault();
+        focusElements[1].focus();
+        setCounter(1);
+      }
+      if (counter > 0) {
+        event.preventDefault();
+        focusElements[counter - 1].focus();
+        setCounter(counter - 1);
+        if (document.activeElement === firstTabStop) {
+          focusElements[focusElements.length - 1].focus();
+          setCounter(focusElements.length - 1);
+        }
+      }
+    }
+  };
+
   return (
     <header className="header" id="header" data-testid="header">
       <div className="container">
@@ -38,8 +163,8 @@ function Header(): JSX.Element {
             </li>
           </ul>
         </nav>
-        <div className="form-search">
-          <form>
+        <div className={`form-search ${searchText.length > 0 ? 'list-opened' : ''}`}>
+          <form onKeyDown={handleKeyFormButton} ref={formRef}>
             <label>
               <svg
                 className="form-search__icon"
@@ -54,27 +179,23 @@ function Header(): JSX.Element {
                 type="text"
                 autoComplete="off"
                 placeholder="Поиск по сайту"
+                onInput={handleSearchInput}
+                ref={inputRef}
+                tabIndex={0}
               />
             </label>
-            <ul className="form-search__select-list">
-              <li className="form-search__select-item" tabIndex={0}>
-                Cannonball Pro MX 8i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-                Cannonball Pro MX 7i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-                Cannonball Pro MX 6i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-                Cannonball Pro MX 5i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-                Cannonball Pro MX 4i
-              </li>
-            </ul>
+            {viewSearch &&
+              <ul className={`form-search__select-list ${searchProducts.length > 4 ? 'scroller' : ''}`} style={{ overflowY: 'auto' }} ref={productListRef}>
+                {searchProducts.length === 0 &&
+                  <li className="form-search__select-item" tabIndex={0}>Ничего не найдено</li>}
+                {searchProducts.length !== 0 && searchProducts.map((product) => (
+                  <li id={String(product.id)} key={product.id} className="form-search__select-item" tabIndex={0} onClick={handleProductClick} onKeyDown={handleKeyProductButton}>
+                    {product.name}
+                  </li>
+                ))}
+              </ul>}
           </form>
-          <button className="form-search__reset" type="reset">
+          <button className="form-search__reset" type="reset" onClick={handleResetSearchButton}>
             <svg width={10} height={10} aria-hidden="true">
               <use xlinkHref="#icon-close" />
             </svg>

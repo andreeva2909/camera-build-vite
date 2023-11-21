@@ -1,7 +1,11 @@
+import { createSelector } from '@reduxjs/toolkit';
 import { SliceName } from '../../constants';
 import { Product, ProductPromo } from '../../types/product';
 import { Review } from '../../types/review';
+import { SortingDirection, SortingType } from '../../types/sorting';
 import { State } from '../../types/state';
+import { filterProductsByCathegory, filterProductsByType, sortProducts } from '../../utils';
+import { NameCathegoryEng } from '../../types/filter';
 
 export const getAllProducts = (state: Pick<State, SliceName.Data>): Product[] => state[SliceName.Data].products;
 export const getAllProductsPromo = (state: Pick<State, SliceName.Data>): ProductPromo[] => state[SliceName.Data].productsPromo;
@@ -16,3 +20,12 @@ export const getSimilarProducts = (state: Pick<State, SliceName.Data>): Product[
 export const getProductReviews = (state: Pick<State, SliceName.Data>): Review[] => state[SliceName.Data].productReviews;
 export const getErrorProductData = (state: Pick<State, SliceName.Data>): boolean => state[SliceName.Data].errorProductData;
 export const getErrorAddReview = (state: Pick<State, SliceName.Data>): boolean => state[SliceName.Data].errorAddReview;
+export const getCurrentSortingType = (state: Pick<State, SliceName.Data>): SortingType => state[SliceName.Data].sortingType;
+export const getCurrentSortingDirection = (state: Pick<State, SliceName.Data>): SortingDirection => state[SliceName.Data].sortingDirection;
+export const getSortedProducts = createSelector([getAllProducts, getCurrentSortingType, getCurrentSortingDirection], (products, sortingType, sotringDirection) => sortProducts(products, sortingType, sotringDirection));
+export const getCurrentFilterCathegory = (state: Pick<State, SliceName.Data>): NameCathegoryEng => state[SliceName.Data].filterCathegory;
+export const getCurrentFilterType = (state: Pick<State, SliceName.Data>): string[] => state[SliceName.Data].filterType;
+export const getCurrentFilterLevel = (state: Pick<State, SliceName.Data>): string[] => state[SliceName.Data].filterLevel;
+export const getFilteredProductsByCathegory = createSelector([getSortedProducts, getCurrentFilterCathegory], (products, cathegory) => products?.slice().filter((product) => filterProductsByCathegory(product, cathegory)));
+export const getFilteredProductsByType = createSelector([getFilteredProductsByCathegory, getCurrentFilterType], (products, type) => filterProductsByType(products, type));
+

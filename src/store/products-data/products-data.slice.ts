@@ -3,6 +3,8 @@ import { SliceName } from '../../constants';
 import { ProductsData } from '../../types/state';
 import { fetchProductsAction, fetchProductsPromoAction, getProductDataAction, getReviewsAction, getSimilarProductsAction, postNewReviewAction } from '../api-actions';
 import { Product } from '../../types/product';
+import { SortingDirection, SortingType } from '../../types/sorting';
+import { NameCathegoryEng } from '../../types/filter';
 
 const initialState: ProductsData = {
   products: [],
@@ -17,7 +19,12 @@ const initialState: ProductsData = {
   similarProducts: [],
   productReviews: [],
   errorProductData: false,
-  errorAddReview: false
+  errorAddReview: false,
+  sortingType: 'none',
+  sortingDirection: 'none',
+  filterCathegory: 'none',
+  filterType: [],
+  filterLevel : []
 };
 
 export const productsData = createSlice({
@@ -40,6 +47,27 @@ export const productsData = createSlice({
           state.selectedProductData = product;
         }
       });
+    },
+    setSortingType: (state, action: PayloadAction<SortingType>) => {
+      state.sortingType = action.payload;
+    },
+    setSortingDirection: (state, action: PayloadAction<SortingDirection>) => {
+      state.sortingDirection = action.payload;
+    },
+    setFilterCathegory: (state, action: PayloadAction<NameCathegoryEng>) => {
+      state.filterCathegory = action.payload;
+    },
+    setFilterType: (state, action: PayloadAction<string>) => {
+      state.filterType.push(action.payload);
+    },
+    deleteFilterType: (state, action: PayloadAction<string>) => {
+      state.filterType.splice(state.filterType.indexOf(action.payload), 1);
+    },
+    setFilterLevel: (state, action: PayloadAction<string>) => {
+      state.filterLevel.push(action.payload);
+    },
+    deleteFilterLevel: (state, action: PayloadAction<string>) => {
+      state.filterLevel.splice(state.filterLevel.indexOf(action.payload), 1);
     },
   },
   extraReducers(builder) {
@@ -97,5 +125,5 @@ export const productsData = createSlice({
   }
 });
 
-export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess } = productsData.actions;
+export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess, setSortingType, setSortingDirection, setFilterCathegory, setFilterType, setFilterLevel, deleteFilterType, deleteFilterLevel } = productsData.actions;
 export { initialState as testInitialState };

@@ -1,6 +1,8 @@
 import { Product, ProductPromo } from './product';
 import { store } from '../store/index';
 import { Review } from './review';
+import { SortingDirection, SortingType } from './sorting';
+import { NameCathegoryEng } from './filter';
 
 export type ProductsData = {
   products: Product[];
@@ -16,6 +18,11 @@ export type ProductsData = {
   productReviews: Review[];
   errorProductData: boolean;
   errorAddReview: boolean;
+  sortingType: SortingType;
+  sortingDirection: SortingDirection;
+  filterCathegory: NameCathegoryEng;
+  filterType: string[];
+  filterLevel : string[];
 }
 
 export type State = ReturnType<typeof store.getState>;
