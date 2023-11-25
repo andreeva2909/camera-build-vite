@@ -3,7 +3,7 @@ import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import Sorting from '../../components/sorting/sorting';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getActivePopupAddItem, getAllProducts, getCurrentFilterCathegory, getCurrentFilterType, getCurrentSortingDirection, getCurrentSortingType, getFilteredProductsByCathegory, getFilteredProductsByType, getSortedProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
+import { getActivePopupAddItem, getAllProducts, getCurrentFilterCathegory, getCurrentFilterLevel, getCurrentFilterType, getCurrentPriceMax, getCurrentPriceMin, getCurrentSortingDirection, getCurrentSortingType, getFilteredProductsByCathegory, getFilteredProductsByLevel, getFilteredProductsByPrice, getFilteredProductsByType, getSortedProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import ProductCardList from '../../components/product-card-list/product-card-list';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MouseEventHandler, useState, useEffect } from 'react';
@@ -15,22 +15,30 @@ import Page404 from '../page-404/page-404';
 import { fetchProductsAction, fetchProductsPromoAction } from '../../store/api-actions';
 import Loader from '../../components/loader/loader';
 import { scrollWindow } from '../../utils';
-
+import { setParamsFromURL } from '../../store/products-data/products-data.slice';
+import { SortingDirection, SortingType } from '../../types/sorting';
+import { NameCathegoryEng } from '../../types/filter';
+import { Params } from '../../types/params';
 
 function MainPage(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const allProducts = useAppSelector(getAllProducts);
   const sortedProducts = useAppSelector(getSortedProducts) || allProducts;
   const filteredProductsByCathegory = useAppSelector(getFilteredProductsByCathegory) || sortedProducts;
   const filteredProductsByType = useAppSelector(getFilteredProductsByType) || filteredProductsByCathegory;
+  const filteredProductsByLevel = useAppSelector(getFilteredProductsByLevel) || filteredProductsByType;
+  const filteredProductsByPrice = useAppSelector(getFilteredProductsByPrice) || filteredProductsByLevel;
   const currentPageNumberFromURL = Number(searchParams.get('page'));
   const [currentPageNumber, setCurrentPage] = useState(currentPageNumberFromURL ? currentPageNumberFromURL : DEFAULT_PAGE_NUMBER);
+  const currentPriceMin = useAppSelector(getCurrentPriceMin);
+  const currentPriceMax = useAppSelector(getCurrentPriceMax);
   const currentSortingType = useAppSelector(getCurrentSortingType);
   const currentSortingDirection = useAppSelector(getCurrentSortingDirection);
   const currentFilterCathegory = useAppSelector(getCurrentFilterCathegory);
   const currentFilterType = useAppSelector(getCurrentFilterType);
+  const currentFilterLevel = useAppSelector(getCurrentFilterLevel);
 
   let currentListPages = 0;
   if (currentPageNumberFromURL < COUNT_PAGES_FOR_ONE_PAGE) {
@@ -44,8 +52,8 @@ function MainPage(): JSX.Element {
     }
   }
   const [listPages, setListPages] = useState(currentListPages);
-  const currentProducts = filteredProductsByType.slice(((currentPageNumberFromURL - 1) * COUNT_PRODUCTS_FOR_ONE_PAGE), (currentPageNumberFromURL * COUNT_PRODUCTS_FOR_ONE_PAGE));
-  const countPages = Math.ceil(filteredProductsByType.length / COUNT_PRODUCTS_FOR_ONE_PAGE);
+  const currentProducts = filteredProductsByPrice.slice(((currentPageNumberFromURL - 1) * COUNT_PRODUCTS_FOR_ONE_PAGE), (currentPageNumberFromURL * COUNT_PRODUCTS_FOR_ONE_PAGE));
+  const countPages = Math.ceil(filteredProductsByPrice.length / COUNT_PRODUCTS_FOR_ONE_PAGE);
   const arrayPages = [];
   for (let i = DEFAULT_PAGE_NUMBER; i < countPages + DEFAULT_PAGE_NUMBER; i++) {
     arrayPages.push(i);
@@ -99,10 +107,58 @@ function MainPage(): JSX.Element {
   };
 
   useEffect(() => {
-    navigate(`?page=${currentPageNumber}&sortType=${currentSortingType}&sortDirection=${currentSortingDirection}&category=${currentFilterCathegory}&types=${currentFilterType.join(',')}`);
-  }, [currentFilterCathegory, currentFilterType, currentPageNumber, currentSortingDirection, currentSortingType, navigate]);
+    const currentPriceMinFromURL = searchParams.get('priceMin');
+    const currentPriceMaxFromURL = searchParams.get('priceMax');
+    const currentSortTypeFromURL = searchParams.get('sortType');
+    const currentSortDirectionFromURL = searchParams.get('sortDirection');
+    const currentFilterCathegoryFromURL = searchParams.get('category');
+    const typeParam = searchParams.get('types');
+    const currentFilterTypesFromURL = typeParam ? typeParam?.split(',') : [];
+    const levelParam = searchParams.get('levels');
+    const currentFilterLevelsFromURL = levelParam ? levelParam?.split(',') : [];
+    dispatch(setParamsFromURL({
+      priceMin: Number(currentPriceMinFromURL),
+      priceMax: Number(currentPriceMaxFromURL),
+      sortingType: currentSortTypeFromURL as SortingType,
+      sortingDirection: currentSortDirectionFromURL as SortingDirection,
+      filterCathegory: currentFilterCathegoryFromURL as NameCathegoryEng,
+      filterType: currentFilterTypesFromURL,
+      filterLevel: currentFilterLevelsFromURL
+    }));
+  }, [dispatch, searchParams]);
 
-  if (countPages !== 0 && !currentPageNumberFromURL || (countPages !== 0 && ((currentPageNumberFromURL < 0) || (currentPageNumberFromURL > countPages)))) {
+  useEffect(() => {
+    const params = {} as Params;
+    if (countPages === 1) {
+      params.page = '1';
+    } else {
+      params.page = String(currentPageNumber);
+    }
+    if (currentPriceMin !== 0) {
+      params.priceMin = String(currentPriceMin);
+    }
+    if (currentPriceMax !== 0) {
+      params.priceMax = String(currentPriceMax);
+    }
+    if (currentSortingType !== null) {
+      params.sortType = currentSortingType;
+    }
+    if (currentSortingDirection !== null) {
+      params.sortDirection = currentSortingDirection;
+    }
+    if (currentFilterCathegory !== null) {
+      params.category = currentFilterCathegory;
+    }
+    if (currentFilterType.length !== 0) {
+      params.types = currentFilterType.join(',');
+    }
+    if (currentFilterLevel.length !== 0) {
+      params.levels = currentFilterLevel.join(',');
+    }
+    setSearchParams(params);
+  }, [countPages, currentFilterCathegory, currentFilterLevel, currentFilterType, currentPageNumber, currentPageNumberFromURL, currentPriceMax, currentPriceMin, currentSortingDirection, currentSortingType, navigate, setSearchParams]);
+
+  if (countPages !== 0 && !currentPageNumberFromURL || (countPages !== 0 && ((currentPageNumberFromURL < 0)))) {
     return <Page404 />;
   }
 
@@ -126,38 +182,45 @@ function MainPage(): JSX.Element {
                 <Filter />
                 <div className="catalog__content">
                   <Sorting />
-                  <ProductCardList products={currentProducts} />
+                  {currentProducts.length === 0 ?
+                    <div>
+                      <br></br>
+                      <br></br>
+                      <p className="title title--h5" style={{paddingLeft: '40%'}}>Товары не найдены</p>
+                    </div>
+                    :
+                    <ProductCardList products={currentProducts} />}
                   {(allProducts.length > COUNT_PRODUCTS_FOR_ONE_PAGE) &&
-                  <div className="pagination">
-                    <ul className="pagination__list">
-                      <li className={`pagination__item ${currentPageNumberFromURL < 4 ? 'visually-hidden' : ''}`} onClick={handleBackButton}>
-                        <a
-                          className="pagination__link pagination__link--text"
-                          href=''
-                        >
-                          Назад
-                        </a>
-                      </li>
-                      {arrayPages.slice(listPages, listPages + COUNT_PAGES_FOR_ONE_PAGE).map((page) => (
-                        <li className="pagination__item" key={page} id={String(page)} onClick={handlePageButton}>
+                    <div className="pagination">
+                      <ul className="pagination__list">
+                        <li className={`pagination__item ${currentPageNumberFromURL < 4 ? 'visually-hidden' : ''}`} onClick={handleBackButton}>
                           <a
-                            className={`pagination__link ${page === currentPageNumberFromURL ? 'pagination__link--active' : ''}`}
+                            className="pagination__link pagination__link--text"
                             href=''
                           >
-                            {page}
+                            Назад
                           </a>
                         </li>
-                      ))}
-                      <li className={`pagination__item ${(listPages + COUNT_PAGES_FOR_ONE_PAGE) >= countPages ? 'visually-hidden' : ''}`} onClick={handleFutherButton}>
-                        <a
-                          className="pagination__link pagination__link--text"
-                          href=''
-                        >
-                          Далее
-                        </a>
-                      </li>
-                    </ul>
-                  </div>}
+                        {arrayPages.slice(listPages, listPages + COUNT_PAGES_FOR_ONE_PAGE).map((page) => (
+                          <li className="pagination__item" key={page} id={String(page)} onClick={handlePageButton}>
+                            <a
+                              className={`pagination__link ${page === currentPageNumberFromURL ? 'pagination__link--active' : ''}`}
+                              href=''
+                            >
+                              {page}
+                            </a>
+                          </li>
+                        ))}
+                        <li className={`pagination__item ${(listPages + COUNT_PAGES_FOR_ONE_PAGE) >= countPages ? 'visually-hidden' : ''}`} onClick={handleFutherButton}>
+                          <a
+                            className="pagination__link pagination__link--text"
+                            href=''
+                          >
+                            Далее
+                          </a>
+                        </li>
+                      </ul>
+                    </div>}
                 </div>
               </div>
             </div>

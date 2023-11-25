@@ -52,7 +52,7 @@ function PopupAddItem(): JSX.Element {
                   <span className="basket-item__article">Артикул:</span>{' '}
                   <span className="basket-item__number">{selectedProductData.vendorCode}</span>
                 </li>
-                <li className="basket-item__list-item">{selectedProductData.type} фотокамера</li>
+                <li className="basket-item__list-item">{selectedProductData.type} {selectedProductData.category === 'Фотоаппарат' ? 'фотокамера' : 'видеокамера'}</li>
                 <li className="basket-item__list-item">{selectedProductData.level} уровень</li>
               </ul>
               <p className="basket-item__price">

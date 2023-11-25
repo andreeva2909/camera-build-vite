@@ -1,27 +1,31 @@
 import { FILTER_CATHEGORY, FILTER_LEVEL, FILTER_TYPE } from '../../constants';
-import { MouseEventHandler, useEffect } from 'react';
+import { FocusEventHandler, MouseEventHandler, useRef, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { deleteFilterLevel, deleteFilterType, setFilterCathegory, setFilterLevel, setFilterType } from '../../store/products-data/products-data.slice';
+import { deleteAllFilterLevels, deleteAllFilterTypes, deleteFilterLevel, deleteFilterType, setFilterCathegory, setFilterLevel, setFilterType, setPriceMax, setPriceMin } from '../../store/products-data/products-data.slice';
 import { NameCathegoryEng, NameLevelEng, NameTypeEng } from '../../types/filter';
-import { getCurrentFilterCathegory, getCurrentFilterLevel, getCurrentFilterType } from '../../store/products-data/products-data.selectors';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getCurrentFilterCathegory, getMaxPriceProduct, getMinPriceProduct } from '../../store/products-data/products-data.selectors';
+import { useSearchParams } from 'react-router-dom';
 
 function Filter(): JSX.Element {
   const dispatch = useAppDispatch();
   const currentFilterCathegory = useAppSelector(getCurrentFilterCathegory);
-  const currentFilterType = useAppSelector(getCurrentFilterType);
-  const currentFilterLevel = useAppSelector(getCurrentFilterLevel);
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const currentPriceMinFromURL = searchParams.get('priceMin');
+  const currentPriceMaxFromURL = searchParams.get('priceMax');
   const currentFilterCathegoryFromURL = String(searchParams.get('category'));
   const currentFilterTypesFromURL = (String(searchParams.get('types'))).split(',');
-  console.log(currentFilterCathegory);
+  const currentFilterLevelsFromURL = (String(searchParams.get('levels'))).split(',');
+  const inputRefPrice = useRef<HTMLInputElement>(null);
+  const inputRefPriceUp = useRef<HTMLInputElement>(null);
+  const inputRefForm = useRef<HTMLFormElement>(null);
+  const minPriceProduct = useAppSelector(getMinPriceProduct);
+  const maxPriceProduct = useAppSelector(getMaxPriceProduct);
 
   const handleFilterCathegory: MouseEventHandler<HTMLInputElement> = (event) => {
-    if (currentFilterCathegoryFromURL === 'null' || event.currentTarget.checked) {
+    if (event.currentTarget.checked) {
       dispatch(setFilterCathegory(event.currentTarget.id as NameCathegoryEng));
     } else {
-      dispatch(setFilterCathegory('none'));
+      dispatch(setFilterCathegory(null));
     }
   };
 
@@ -41,30 +45,100 @@ function Filter(): JSX.Element {
     }
   };
 
-  if (currentFilterType.length === 0) {
-    //currentFilterTypesFromURL.shift();
-    currentFilterTypesFromURL.map((filterType) => {
-      dispatch(setFilterType(filterType as NameTypeEng));
-    });
-  }
+  const handleInputPrice: MouseEventHandler<HTMLInputElement> = (event) => {
+    if (Number(event.currentTarget.value) < 0) {
+      if (inputRefPrice.current?.value) {
+        inputRefPrice.current.value = String(Number(event.currentTarget.value) * -1);
+      }
+    }
+  };
+
+  const handleInputPriceUp: MouseEventHandler<HTMLInputElement> = (event) => {
+    if (Number(event.currentTarget.value) < 0) {
+      if (inputRefPriceUp.current?.value) {
+        inputRefPriceUp.current.value = String(Number(event.currentTarget.value) * -1);
+      }
+    }
+  };
+
+  const handleBlurPrice: FocusEventHandler<HTMLInputElement> = (event) => {
+    if (Number(event.currentTarget.value) === 0) {
+      dispatch(setPriceMin(0));
+    }
+    if (Number(event.currentTarget.value) < Number(minPriceProduct)) {
+      if (inputRefPrice.current?.value) {
+        inputRefPrice.current.value = String(minPriceProduct);
+        dispatch(setPriceMin(Number(minPriceProduct)));
+      }
+    } else {
+      dispatch(setPriceMin(Number(event.currentTarget.value)));
+    }
+  };
+
+  const handleBlurPriceUp: FocusEventHandler<HTMLInputElement> = (event) => {
+    if (Number(event.currentTarget.value) === 0) {
+      dispatch(setPriceMax(0));
+    }
+    if (Number(event.currentTarget.value) > Number(maxPriceProduct)) {
+      if (inputRefPriceUp.current?.value) {
+        inputRefPriceUp.current.value = String(maxPriceProduct);
+        dispatch(setPriceMax(Number(maxPriceProduct)));
+      }
+    } else {
+      dispatch(setPriceMax(Number(event.currentTarget.value)));
+    }
+  };
+
+  const handleResetFilters: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    dispatch(setFilterCathegory(null));
+    dispatch(deleteAllFilterTypes());
+    dispatch(deleteAllFilterLevels());
+    dispatch(setPriceMin(0));
+    dispatch(setPriceMax(0));
+    if (inputRefPrice.current?.value) {
+      inputRefPrice.current.value = '';
+    }
+    if (inputRefPriceUp.current?.value) {
+      inputRefPriceUp.current.value = '';
+    }
+    inputRefForm.current?.reset();
+  };
 
   useEffect(() => {
-    if (currentFilterCathegory === 'null') {
-      dispatch(setFilterCathegory(currentFilterCathegoryFromURL as NameCathegoryEng));
+    if (Number(currentPriceMaxFromURL) < Number(currentPriceMinFromURL) && currentPriceMaxFromURL !== null) {
+      if (inputRefPriceUp.current?.value) {
+        inputRefPriceUp.current.value = String(maxPriceProduct);
+        dispatch(setPriceMax(Number(maxPriceProduct)));
+      }
     }
-  }, [currentFilterCathegory, currentFilterCathegoryFromURL, currentFilterType, currentFilterType.length, currentFilterTypesFromURL, dispatch, navigate]);
+    if (Number(maxPriceProduct) < Number(currentPriceMinFromURL)) {
+      if (inputRefPrice.current?.value) {
+        inputRefPrice.current.value = String(minPriceProduct);
+        dispatch(setPriceMin(Number(minPriceProduct)));
+      }
+    }
+  });
 
   return (
     <div className="catalog__aside" data-testid="filter">
       <div className="catalog-filter">
-        <form action="#">
+        <form action="#" ref={inputRefForm}>
           <h2 className="visually-hidden">Фильтр</h2>
           <fieldset className="catalog-filter__block">
             <legend className="title title--h5">Цена, ₽</legend>
             <div className="catalog-filter__price-range">
               <div className="custom-input">
                 <label>
-                  <input type="number" name="price" placeholder="от" />
+                  <input
+                    type="number"
+                    name="price"
+                    onInput={handleInputPrice}
+                    onBlur={handleBlurPrice}
+                    ref={inputRefPrice}
+                    placeholder={String(minPriceProduct) !== 'undefined' ? String(minPriceProduct) : 'от'}
+                    defaultValue={String(currentPriceMinFromURL)}
+                  />
                 </label>
               </div>
               <div className="custom-input">
@@ -72,7 +146,11 @@ function Filter(): JSX.Element {
                   <input
                     type="number"
                     name="priceUp"
-                    placeholder="до"
+                    onInput={handleInputPriceUp}
+                    onBlur={handleBlurPriceUp}
+                    ref={inputRefPriceUp}
+                    placeholder={String(maxPriceProduct) !== 'undefined' ? String(maxPriceProduct) : 'до'}
+                    defaultValue={String(currentPriceMaxFromURL)}
                   />
                 </label>
               </div>
@@ -123,7 +201,7 @@ function Filter(): JSX.Element {
             {FILTER_LEVEL.map((filter) => (
               <div className="custom-checkbox catalog-filter__item" key={filter.nameEng}>
                 <label>
-                  <input type="checkbox" name={filter.nameEng} id={filter.nameEng} onClick={handleFilterLevel}/>
+                  <input type="checkbox" name={filter.nameEng} id={filter.nameEng} onClick={handleFilterLevel} defaultChecked={currentFilterLevelsFromURL.includes(filter.nameEng)}/>
                   <span className="custom-checkbox__icon" />
                   <span className="custom-checkbox__label">{filter.nameRu}</span>
                 </label>
@@ -133,6 +211,7 @@ function Filter(): JSX.Element {
           <button
             className="btn catalog-filter__reset-btn"
             type="reset"
+            onClick={handleResetFilters}
           >
             Сбросить фильтры
           </button>

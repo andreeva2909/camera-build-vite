@@ -1,13 +1,12 @@
-import { MouseEventHandler, useEffect } from 'react';
+import { MouseEventHandler } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { setSortingDirection, setSortingType } from '../../store/products-data/products-data.slice';
 import { SortingDirection, SortingType } from '../../types/sorting';
 import { getCurrentSortingDirection, getCurrentSortingType } from '../../store/products-data/products-data.selectors';
 import { CurrentSortingDirection, CurrentSortingType } from '../../constants';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 function Sorting(): JSX.Element {
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const currentSortingType = useAppSelector(getCurrentSortingType);
   const currentSortingDirection = useAppSelector(getCurrentSortingDirection);
@@ -28,17 +27,6 @@ function Sorting(): JSX.Element {
     }
     dispatch(setSortingDirection(event.currentTarget.id as SortingDirection));
   };
-
-  useEffect(() => {
-    if (currentSortDirectionFromURL === 'null') {
-      dispatch(setSortingDirection(CurrentSortingDirection.Up));
-    }
-    if (currentSortTypeFromURL === 'null') {
-      dispatch(setSortingType(CurrentSortingType.Price));
-    }
-    dispatch(setSortingType(currentSortTypeFromURL as SortingType));
-    dispatch(setSortingDirection(currentSortDirectionFromURL as SortingDirection));
-  }, [currentSortDirectionFromURL, currentSortTypeFromURL, dispatch, navigate]);
 
   return (
     <div className="catalog-sort" data-testid="sorting">

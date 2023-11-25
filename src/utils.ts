@@ -1,4 +1,4 @@
-import { CurrentSortingType, CurrentSortingDirection, FILTER_CATHEGORY, FILTER_TYPE } from './constants';
+import { CurrentSortingType, CurrentSortingDirection, FILTER_CATHEGORY, FILTER_TYPE, FILTER_LEVEL } from './constants';
 import { Product } from './types/product';
 import { Review } from './types/review';
 import { SortingDirection, SortingType } from './types/sorting';
@@ -29,11 +29,7 @@ function sortPopularDown(productA: Product, productB: Product): number {
   return productB.rating - productA.rating;
 }
 
-function sortProducts(products: Product[], sortingType: SortingType, sortingDirection: SortingDirection) {
-  if ((sortingType === CurrentSortingType.None && sortingDirection === CurrentSortingDirection.None) || (sortingType === 'null' && sortingDirection === 'null')) {
-    return products.slice();
-  }
-
+function sortProducts(products: Product[], sortingType: SortingType | null, sortingDirection: SortingDirection | null) {
   if ((sortingType === CurrentSortingType.Price || sortingType === CurrentSortingType.Popular) && sortingDirection === CurrentSortingDirection.None) {
     if (sortingType === CurrentSortingType.Price) {
       return products.slice().sort(sortPriceUp);
@@ -67,10 +63,11 @@ function sortProducts(products: Product[], sortingType: SortingType, sortingDire
   if (sortingType === CurrentSortingType.Popular && sortingDirection === CurrentSortingDirection.Down) {
     return products.slice().sort(sortPopularDown);
   }
+  return products.slice();
 }
 
-function filterProductsByCathegory(product: Product, cathegory: string) {
-  if (cathegory === 'none' || cathegory === 'null') {
+function filterProductsByCathegory(product: Product, cathegory: string | null) {
+  if (cathegory === 'none' || cathegory === null || cathegory === '') {
     return product;
   }
   if (cathegory === FILTER_CATHEGORY[0].nameEng) {
@@ -82,7 +79,6 @@ function filterProductsByCathegory(product: Product, cathegory: string) {
 }
 
 function filterProductsByType(products: Product[] | undefined, type: string[]) {
-  console.log(type);
   if (type.length === 0 || type[0] === 'null' || type[0] === '') {
     return products;
   } else {
@@ -107,4 +103,49 @@ function filterProductsByType(products: Product[] | undefined, type: string[]) {
   }
 }
 
-export { sortReviews, scrollWindow, sortProducts, filterProductsByCathegory, filterProductsByType };
+function filterProductsByLevel(products: Product[] | undefined, level: string[]) {
+  if (level.length === 0 || level[0] === 'null' || level[0] === '') {
+    return products;
+  } else {
+    const currentProducts = [] as Product[];
+    products?.map((product) => {
+      level.map((element) => {
+        if ((product.level === FILTER_LEVEL[0].nameRu) && (element === FILTER_LEVEL[0].nameEng)) {
+          currentProducts.push(product);
+        }
+        if ((product.level === FILTER_LEVEL[1].nameRu) && (element === FILTER_LEVEL[1].nameEng)) {
+          currentProducts.push(product);
+        }
+        if ((product.level === FILTER_LEVEL[2].nameRu) && (element === FILTER_LEVEL[2].nameEng)) {
+          currentProducts.push(product);
+        }
+      });
+    });
+    return currentProducts;
+  }
+}
+
+function getMinumimumPriceProduct (products: Product[] | undefined) {
+  if (products !== undefined) {
+    return sortProducts(products, 'price', 'up')[0]?.price;
+  }
+}
+
+function getMaximumPriceProduct (products: Product[] | undefined) {
+  if (products !== undefined) {
+    return sortProducts(products, 'price', 'down')[0]?.price;
+  }
+}
+
+function filterProductsByPrice(product: Product, currentPriceMin: number, currentPriceMax: number, priceMax: number) {
+  if (currentPriceMin === 0 && currentPriceMax === 0) {
+    return product;
+  }
+  if (currentPriceMax < currentPriceMin) {
+    return product.price >= currentPriceMin && product.price <= priceMax;
+  }
+  return product.price >= currentPriceMin && product.price <= currentPriceMax;
+
+}
+
+export { sortReviews, scrollWindow, sortProducts, filterProductsByCathegory, filterProductsByType, filterProductsByLevel, getMinumimumPriceProduct, getMaximumPriceProduct, filterProductsByPrice };

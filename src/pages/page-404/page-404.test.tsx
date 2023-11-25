@@ -1,13 +1,18 @@
 import Page404 from './page-404';
-import { withHistory } from '../../test-mocks/test-component';
 import { render, screen } from '@testing-library/react';
+import { withHistory, withStore } from '../../test-mocks/test-component';
+import { testInitialState } from '../../store/products-data/products-data.slice';
 
 describe('Component: Page404', () => {
   it('should render correctly', () => {
     const expectedHeaderText = '404 page not found';
     const expectedLinkText = 'Вернуться на главную страницу';
-    const preparedComponent = withHistory(<Page404 />);
-
+    const { withStoreComponent } = withStore(<Page404 />, {
+      Data: {
+        ...testInitialState
+      }
+    });
+    const preparedComponent = withHistory(withStoreComponent);
     render(preparedComponent);
 
     expect(screen.getByText(expectedHeaderText)).toBeInTheDocument();

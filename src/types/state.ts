@@ -18,11 +18,13 @@ export type ProductsData = {
   productReviews: Review[];
   errorProductData: boolean;
   errorAddReview: boolean;
-  sortingType: SortingType;
-  sortingDirection: SortingDirection;
-  filterCathegory: NameCathegoryEng;
+  sortingType: SortingType | null;
+  sortingDirection: SortingDirection | null;
+  filterCathegory: NameCathegoryEng | null;
   filterType: string[];
   filterLevel : string[];
+  priceMin: number;
+  priceMax: number;
 }
 
 export type State = ReturnType<typeof store.getState>;

@@ -20,11 +20,13 @@ const initialState: ProductsData = {
   productReviews: [],
   errorProductData: false,
   errorAddReview: false,
-  sortingType: 'none',
-  sortingDirection: 'none',
-  filterCathegory: 'none',
+  sortingType: null,
+  sortingDirection: null,
+  filterCathegory: null,
   filterType: [],
-  filterLevel : []
+  filterLevel : [],
+  priceMin: 0,
+  priceMax: 0
 };
 
 export const productsData = createSlice({
@@ -54,7 +56,7 @@ export const productsData = createSlice({
     setSortingDirection: (state, action: PayloadAction<SortingDirection>) => {
       state.sortingDirection = action.payload;
     },
-    setFilterCathegory: (state, action: PayloadAction<NameCathegoryEng>) => {
+    setFilterCathegory: (state, action: PayloadAction<NameCathegoryEng | null>) => {
       state.filterCathegory = action.payload;
     },
     setFilterType: (state, action: PayloadAction<string>) => {
@@ -63,12 +65,34 @@ export const productsData = createSlice({
     deleteFilterType: (state, action: PayloadAction<string>) => {
       state.filterType.splice(state.filterType.indexOf(action.payload), 1);
     },
+    deleteAllFilterTypes: (state) => {
+      state.filterType = [];
+    },
     setFilterLevel: (state, action: PayloadAction<string>) => {
       state.filterLevel.push(action.payload);
     },
     deleteFilterLevel: (state, action: PayloadAction<string>) => {
       state.filterLevel.splice(state.filterLevel.indexOf(action.payload), 1);
     },
+    deleteAllFilterLevels: (state) => {
+      state.filterLevel = [];
+    },
+    setPriceMin: (state, action: PayloadAction<number>) => {
+      state.priceMin = action.payload;
+    },
+    setPriceMax: (state, action: PayloadAction<number>) => {
+      state.priceMax = action.payload;
+    },
+    setParamsFromURL: (state, action: PayloadAction<{priceMin: number; priceMax: number; sortingType: SortingType; sortingDirection: SortingDirection; filterCathegory: NameCathegoryEng; filterType: string[]; filterLevel: string[]}>) => {
+      const {priceMin, priceMax, sortingType, sortingDirection, filterCathegory, filterType, filterLevel} = action.payload;
+      state.priceMin = priceMin;
+      state.priceMax = priceMax;
+      state.sortingType = sortingType;
+      state.sortingDirection = sortingDirection;
+      state.filterCathegory = filterCathegory;
+      state.filterType = filterType;
+      state.filterLevel = filterLevel;
+    }
   },
   extraReducers(builder) {
     builder
@@ -125,5 +149,5 @@ export const productsData = createSlice({
   }
 });
 
-export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess, setSortingType, setSortingDirection, setFilterCathegory, setFilterType, setFilterLevel, deleteFilterType, deleteFilterLevel } = productsData.actions;
+export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess, setSortingType, setSortingDirection, setFilterCathegory, setFilterType, setFilterLevel, deleteFilterType, deleteFilterLevel, setPriceMin, setPriceMax, setParamsFromURL, deleteAllFilterTypes, deleteAllFilterLevels } = productsData.actions;
 export { initialState as testInitialState };
