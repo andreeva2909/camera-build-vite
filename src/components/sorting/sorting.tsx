@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { setSortingDirection, setSortingType } from '../../store/products-data/products-data.slice';
 import { SortingDirection, SortingType } from '../../types/sorting';
 import { getCurrentSortingDirection, getCurrentSortingType } from '../../store/products-data/products-data.selectors';
-import { CurrentSortingDirection, CurrentSortingType } from '../../constants';
+import { CurrentSortingDirection, CurrentSortingType, NameParameterFromURL } from '../../constants';
 import { useSearchParams } from 'react-router-dom';
 
 function Sorting(): JSX.Element {
@@ -11,8 +11,8 @@ function Sorting(): JSX.Element {
   const currentSortingType = useAppSelector(getCurrentSortingType);
   const currentSortingDirection = useAppSelector(getCurrentSortingDirection);
   const [searchParams] = useSearchParams();
-  const currentSortTypeFromURL = String(searchParams.get('sortType'));
-  const currentSortDirectionFromURL = String(searchParams.get('sortDirection'));
+  const currentSortTypeFromURL = String(searchParams.get(NameParameterFromURL.SortingType));
+  const currentSortDirectionFromURL = String(searchParams.get(NameParameterFromURL.SortingDirection));
 
   const handleSortingTypeButton: MouseEventHandler<HTMLInputElement> = (event) => {
     if (currentSortDirectionFromURL === 'null' || currentSortingDirection === CurrentSortingDirection.None) {

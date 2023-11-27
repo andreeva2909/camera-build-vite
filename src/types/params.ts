@@ -1,4 +1,4 @@
-import { NameCathegoryEng } from './filter';
+import { NameCategoryEng } from './filter';
 import { SortingDirection, SortingType } from './sorting';
 
 export type Params = {
@@ -7,7 +7,18 @@ export type Params = {
   page: string;
   sortType: SortingType;
   sortDirection: SortingDirection;
-  category: NameCathegoryEng;
+  category: NameCategoryEng;
   types: string;
   levels: string;
 }
+
+export type ParamsFromURL = {
+  priceMin: number;
+  priceMax: number;
+  sortingType: SortingType;
+  sortingDirection: SortingDirection;
+  filterCategory: NameCategoryEng;
+  filterType: string[];
+  filterLevel: string[];
+}
+

@@ -1,6 +1,7 @@
+import { CurrentSortingDirection, CurrentSortingType, FILTER_CATEGORY, FILTER_LEVEL, FILTER_TYPE } from '../../constants';
 import { makeFakeProduct, makeFakeProductPromo, makeFakeReview } from '../../test-mocks/test-mocks';
 import { fetchProductsAction, fetchProductsPromoAction, getProductDataAction, getReviewsAction, getSimilarProductsAction, postNewReviewAction } from '../api-actions';
-import { productsData, selectProductId, setPopupAddItem, setPopupAddReview, setPopupAddReviewSuccess, testInitialState } from './products-data.slice';
+import { deleteAllFilterLevels, deleteAllFilterTypes, deleteFilterLevel, deleteFilterType, productsData, selectProductId, setFilterCategory, setFilterLevel, setFilterType, setParamsFromURL, setPopupAddItem, setPopupAddReview, setPopupAddReviewSuccess, setPriceMax, setPriceMin, setSortingDirection, setSortingType, testInitialState } from './products-data.slice';
 
 describe('ProductData Slice', () => {
   const state = {
@@ -54,7 +55,6 @@ describe('ProductData Slice', () => {
     expect(result.isActivePopupAddReviewSuccess).toBe(expectedStatusPopupAddReviewSuccess);
   });
 
-
   it('Должен вернуть состояние выбранного id товара и информацию по нему', () => {
     const productData = makeFakeProduct();
     const expectedSelectedProductId = '4';
@@ -66,6 +66,97 @@ describe('ProductData Slice', () => {
     const result = productsData.reducer(expectedState, selectProductId(expectedSelectedProductId));
     expect(result.selectedProductId).toBe(expectedSelectedProductId);
     expect(result.selectedProductData).toBe(productData);
+  });
+
+  it('Должен вернуть тип выбранной сортировки', () => {
+    const expectedSortingType = CurrentSortingType.Price;
+    const result = productsData.reducer(state, setSortingType(expectedSortingType));
+    expect(result.sortingType).toBe(expectedSortingType);
+  });
+
+  it('Должен вернуть направление выбранной сортировки', () => {
+    const expectedSortingDirection = CurrentSortingDirection.Up;
+    const result = productsData.reducer(state, setSortingDirection(expectedSortingDirection));
+    expect(result.sortingDirection).toBe(expectedSortingDirection);
+  });
+
+  it('Должен вернуть выбранный фильтр по категории', () => {
+    const expectedFilterCategory = FILTER_CATEGORY[1].nameEng;
+    const result = productsData.reducer(state, setFilterCategory(expectedFilterCategory));
+    expect(result.filterCategory).toBe(expectedFilterCategory);
+  });
+
+  it('Должен вернуть выбранный фильтр по типу', () => {
+    const expectedFilterType = FILTER_TYPE[1].nameEng;
+    const result = productsData.reducer(state, setFilterType(expectedFilterType));
+    expect(result.filterType).toStrictEqual([expectedFilterType]);
+  });
+
+  it('Должен удалить выбранный фильтр по типу', () => {
+    const expectedFilterType = FILTER_TYPE[1].nameEng;
+    const result = productsData.reducer(state, deleteFilterType(expectedFilterType));
+    expect(result.filterType).toStrictEqual([]);
+  });
+
+  it('Должен удалить все выбранные фильтры по типу', () => {
+    const result = productsData.reducer(state, deleteAllFilterTypes());
+    expect(result.filterType).toStrictEqual([]);
+  });
+
+  it('Должен вернуть выбранный фильтр по уровню', () => {
+    const expectedFilterLevel = FILTER_LEVEL[1].nameEng;
+    const result = productsData.reducer(state, setFilterLevel(expectedFilterLevel));
+    expect(result.filterLevel).toStrictEqual([expectedFilterLevel]);
+  });
+
+  it('Должен удалить выбранный фильтр по уровню', () => {
+    const expectedFilterType = FILTER_LEVEL[1].nameEng;
+    const result = productsData.reducer(state, deleteFilterLevel(expectedFilterType));
+    expect(result.filterType).toStrictEqual([]);
+  });
+
+  it('Должен удалить все выбранные фильтры по уровню', () => {
+    const result = productsData.reducer(state, deleteAllFilterLevels());
+    expect(result.filterLevel).toStrictEqual([]);
+  });
+
+  it('Должен вернуть минимальную стоимость товара', () => {
+    const expectedPriceMin = 1000;
+    const result = productsData.reducer(state, setPriceMin(expectedPriceMin));
+    expect(result.priceMin).toBe(expectedPriceMin);
+  });
+
+  it('Должен вернуть максимальную стоимость товара', () => {
+    const expectedPriceMax = 5000;
+    const result = productsData.reducer(state, setPriceMax(expectedPriceMax));
+    expect(result.priceMax).toBe(expectedPriceMax);
+  });
+
+  it('Должен вернуть значения параметров из url', () => {
+    const expectedPriceMin = 1000;
+    const expectedPriceMax = 5000;
+    const expectedSortingType = CurrentSortingType.Price;
+    const expectedSortingDirection = CurrentSortingDirection.Up;
+    const expectedFilterCategory = FILTER_CATEGORY[1].nameEng;
+    const expectedFilterType = [FILTER_TYPE[1].nameEng];
+    const expectedFilterLevel = [FILTER_LEVEL[1].nameEng];
+    const params = {
+      priceMin: expectedPriceMin,
+      priceMax: expectedPriceMax,
+      sortingType: expectedSortingType,
+      sortingDirection: expectedSortingDirection,
+      filterCategory: expectedFilterCategory,
+      filterType: expectedFilterType,
+      filterLevel: expectedFilterLevel
+    };
+    const result = productsData.reducer(initialState, setParamsFromURL(params));
+    expect(result.priceMin).toEqual(expectedPriceMin);
+    expect(result.priceMax).toEqual(expectedPriceMax);
+    expect(result.sortingType).toEqual(expectedSortingType);
+    expect(result.sortingDirection).toEqual(expectedSortingDirection);
+    expect(result.filterCategory).toEqual(expectedFilterCategory);
+    expect(result.filterType).toEqual(expectedFilterType);
+    expect(result.filterLevel).toEqual(expectedFilterLevel);
   });
 
   it('Должен вернуть статус загрузки информации по товарам true и статус ошибки false', () => {

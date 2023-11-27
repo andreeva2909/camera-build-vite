@@ -3,11 +3,11 @@ import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import Sorting from '../../components/sorting/sorting';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getActivePopupAddItem, getAllProducts, getCurrentFilterCathegory, getCurrentFilterLevel, getCurrentFilterType, getCurrentPriceMax, getCurrentPriceMin, getCurrentSortingDirection, getCurrentSortingType, getFilteredProductsByCathegory, getFilteredProductsByLevel, getFilteredProductsByPrice, getFilteredProductsByType, getSortedProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
+import { getActivePopupAddItem, getAllProducts, getCurrentFilterCategory, getCurrentFilterLevel, getCurrentFilterType, getCurrentPriceMax, getCurrentPriceMin, getCurrentSortingDirection, getCurrentSortingType, getFilteredProductsByCategory, getFilteredProductsByLevel, getFilteredProductsByPrice, getFilteredProductsByType, getSortedProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import ProductCardList from '../../components/product-card-list/product-card-list';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MouseEventHandler, useState, useEffect } from 'react';
-import { COUNT_PAGES_FOR_ONE_PAGE, COUNT_PRODUCTS_FOR_ONE_PAGE, DEFAULT_PAGE_NUMBER } from '../../constants';
+import { COUNT_PAGES_FOR_ONE_PAGE, COUNT_PRODUCTS_FOR_ONE_PAGE, DEFAULT_PAGE_NUMBER, NameParameterFromURL } from '../../constants';
 import PopupAddItem from '../../components/popup-add-item/popup-add-item';
 import Breadcrumbs from '../../components/breadcrumbs/breadcrumbs';
 import Banner from '../../components/banner/banner';
@@ -17,7 +17,7 @@ import Loader from '../../components/loader/loader';
 import { scrollWindow } from '../../utils';
 import { setParamsFromURL } from '../../store/products-data/products-data.slice';
 import { SortingDirection, SortingType } from '../../types/sorting';
-import { NameCathegoryEng } from '../../types/filter';
+import { NameCategoryEng } from '../../types/filter';
 import { Params } from '../../types/params';
 
 function MainPage(): JSX.Element {
@@ -26,17 +26,17 @@ function MainPage(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
   const allProducts = useAppSelector(getAllProducts);
   const sortedProducts = useAppSelector(getSortedProducts) || allProducts;
-  const filteredProductsByCathegory = useAppSelector(getFilteredProductsByCathegory) || sortedProducts;
-  const filteredProductsByType = useAppSelector(getFilteredProductsByType) || filteredProductsByCathegory;
+  const filteredProductsByCategory = useAppSelector(getFilteredProductsByCategory) || sortedProducts;
+  const filteredProductsByType = useAppSelector(getFilteredProductsByType) || filteredProductsByCategory;
   const filteredProductsByLevel = useAppSelector(getFilteredProductsByLevel) || filteredProductsByType;
   const filteredProductsByPrice = useAppSelector(getFilteredProductsByPrice) || filteredProductsByLevel;
-  const currentPageNumberFromURL = Number(searchParams.get('page'));
+  const currentPageNumberFromURL = Number(searchParams.get(NameParameterFromURL.Page));
   const [currentPageNumber, setCurrentPage] = useState(currentPageNumberFromURL ? currentPageNumberFromURL : DEFAULT_PAGE_NUMBER);
   const currentPriceMin = useAppSelector(getCurrentPriceMin);
   const currentPriceMax = useAppSelector(getCurrentPriceMax);
   const currentSortingType = useAppSelector(getCurrentSortingType);
   const currentSortingDirection = useAppSelector(getCurrentSortingDirection);
-  const currentFilterCathegory = useAppSelector(getCurrentFilterCathegory);
+  const currentFilterCategory = useAppSelector(getCurrentFilterCategory);
   const currentFilterType = useAppSelector(getCurrentFilterType);
   const currentFilterLevel = useAppSelector(getCurrentFilterLevel);
 
@@ -107,21 +107,21 @@ function MainPage(): JSX.Element {
   };
 
   useEffect(() => {
-    const currentPriceMinFromURL = searchParams.get('priceMin');
-    const currentPriceMaxFromURL = searchParams.get('priceMax');
-    const currentSortTypeFromURL = searchParams.get('sortType');
-    const currentSortDirectionFromURL = searchParams.get('sortDirection');
-    const currentFilterCathegoryFromURL = searchParams.get('category');
-    const typeParam = searchParams.get('types');
+    const currentPriceMinFromURL = searchParams.get(NameParameterFromURL.PriceMin);
+    const currentPriceMaxFromURL = searchParams.get(NameParameterFromURL.PriceMax);
+    const currentSortTypeFromURL = searchParams.get(NameParameterFromURL.SortingType);
+    const currentSortDirectionFromURL = searchParams.get(NameParameterFromURL.SortingDirection);
+    const currentFilterCategoryFromURL = searchParams.get(NameParameterFromURL.Category);
+    const typeParam = searchParams.get(NameParameterFromURL.Type);
     const currentFilterTypesFromURL = typeParam ? typeParam?.split(',') : [];
-    const levelParam = searchParams.get('levels');
+    const levelParam = searchParams.get(NameParameterFromURL.Level);
     const currentFilterLevelsFromURL = levelParam ? levelParam?.split(',') : [];
     dispatch(setParamsFromURL({
       priceMin: Number(currentPriceMinFromURL),
       priceMax: Number(currentPriceMaxFromURL),
       sortingType: currentSortTypeFromURL as SortingType,
       sortingDirection: currentSortDirectionFromURL as SortingDirection,
-      filterCathegory: currentFilterCathegoryFromURL as NameCathegoryEng,
+      filterCategory: currentFilterCategoryFromURL as NameCategoryEng,
       filterType: currentFilterTypesFromURL,
       filterLevel: currentFilterLevelsFromURL
     }));
@@ -146,8 +146,8 @@ function MainPage(): JSX.Element {
     if (currentSortingDirection !== null) {
       params.sortDirection = currentSortingDirection;
     }
-    if (currentFilterCathegory !== null) {
-      params.category = currentFilterCathegory;
+    if (currentFilterCategory !== null) {
+      params.category = currentFilterCategory;
     }
     if (currentFilterType.length !== 0) {
       params.types = currentFilterType.join(',');
@@ -156,7 +156,7 @@ function MainPage(): JSX.Element {
       params.levels = currentFilterLevel.join(',');
     }
     setSearchParams(params);
-  }, [countPages, currentFilterCathegory, currentFilterLevel, currentFilterType, currentPageNumber, currentPageNumberFromURL, currentPriceMax, currentPriceMin, currentSortingDirection, currentSortingType, navigate, setSearchParams]);
+  }, [countPages, currentFilterCategory, currentFilterLevel, currentFilterType, currentPageNumber, currentPageNumberFromURL, currentPriceMax, currentPriceMin, currentSortingDirection, currentSortingType, navigate, setSearchParams]);
 
   if (countPages !== 0 && !currentPageNumberFromURL || (countPages !== 0 && ((currentPageNumberFromURL < 0)))) {
     return <Page404 />;

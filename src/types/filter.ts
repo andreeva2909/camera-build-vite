@@ -1,10 +1,10 @@
-export type NameCathegoryEng = 'photocamera' | 'videocamera';
+export type NameCategoryEng = 'photocamera' | 'videocamera';
 
-export type NameCathegoryRu = 'Фотоаппарат' | 'Фотокамера' | 'Видеокамера';
+export type NameCategoryRu = 'Фотоаппарат' | 'Фотокамера' | 'Видеокамера';
 
-export type FilterCathegoryType = {
-  nameEng: NameCathegoryEng;
-  nameRu: NameCathegoryRu;
+export type FilterCategoryType = {
+  nameEng: NameCategoryEng;
+  nameRu: NameCategoryRu;
 };
 
 export type NameTypeEng = 'digital' | 'film' | 'snapshot' | 'collection';

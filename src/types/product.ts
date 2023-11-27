@@ -1,11 +1,11 @@
-import { NameCathegoryRu, NameLevelRu, NameTypeRu } from './filter';
+import { NameCategoryRu, NameLevelRu, NameTypeRu } from './filter';
 
 export type Product = {
   id: number;
   name: string;
   vendorCode: string;
   type: NameTypeRu;
-  category: NameCathegoryRu;
+  category: NameCategoryRu;
   description: string;
   level: NameLevelRu;
   price: number;

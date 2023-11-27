@@ -1,4 +1,4 @@
-import { CurrentSortingType, CurrentSortingDirection, FILTER_CATHEGORY, FILTER_TYPE, FILTER_LEVEL } from './constants';
+import { CurrentSortingType, CurrentSortingDirection, FILTER_CATEGORY, FILTER_TYPE, FILTER_LEVEL, NameCategoryFromServer } from './constants';
 import { Product } from './types/product';
 import { Review } from './types/review';
 import { SortingDirection, SortingType } from './types/sorting';
@@ -66,15 +66,15 @@ function sortProducts(products: Product[], sortingType: SortingType | null, sort
   return products.slice();
 }
 
-function filterProductsByCathegory(product: Product, cathegory: string | null) {
-  if (cathegory === 'none' || cathegory === null || cathegory === '') {
+function filterProductsByCategory(product: Product, category: string | null) {
+  if (category === 'none' || category === null || category === '') {
     return product;
   }
-  if (cathegory === FILTER_CATHEGORY[0].nameEng) {
-    return product.category === 'Фотоаппарат';
+  if (category === FILTER_CATEGORY[0].nameEng) {
+    return product.category === NameCategoryFromServer.Photocamera;
   }
-  if (cathegory === FILTER_CATHEGORY[1].nameEng) {
-    return product.category === 'Видеокамера';
+  if (category === FILTER_CATEGORY[1].nameEng) {
+    return product.category === NameCategoryFromServer.Videocamera;
   }
 }
 
@@ -127,13 +127,13 @@ function filterProductsByLevel(products: Product[] | undefined, level: string[])
 
 function getMinumimumPriceProduct (products: Product[] | undefined) {
   if (products !== undefined) {
-    return sortProducts(products, 'price', 'up')[0]?.price;
+    return sortProducts(products, CurrentSortingType.Price, CurrentSortingDirection.Up)[0]?.price;
   }
 }
 
 function getMaximumPriceProduct (products: Product[] | undefined) {
   if (products !== undefined) {
-    return sortProducts(products, 'price', 'down')[0]?.price;
+    return sortProducts(products, CurrentSortingType.Price, CurrentSortingDirection.Down)[0]?.price;
   }
 }
 
@@ -148,4 +148,4 @@ function filterProductsByPrice(product: Product, currentPriceMin: number, curren
 
 }
 
-export { sortReviews, scrollWindow, sortProducts, filterProductsByCathegory, filterProductsByType, filterProductsByLevel, getMinumimumPriceProduct, getMaximumPriceProduct, filterProductsByPrice };
+export { sortReviews, scrollWindow, sortProducts, filterProductsByCategory, filterProductsByType, filterProductsByLevel, getMinumimumPriceProduct, getMaximumPriceProduct, filterProductsByPrice };

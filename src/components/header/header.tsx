@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { AppRoute, Tab } from '../../constants';
+import { AppRoute, COUNT_PRODUCTS_FOR_SCROLLER, COUNT_PRODUCTS_FOR_SEARCH, Tab } from '../../constants';
 import { ChangeEventHandler, MouseEventHandler, useState, useRef } from 'react';
 import { useAppSelector } from '../../hooks';
 import { getAllProducts } from '../../store/products-data/products-data.selectors';
@@ -21,7 +21,7 @@ function Header(): JSX.Element {
     const currentProducts = [] as Product[];
     setSearchProducts([]);
     setSearchText(event.currentTarget.value);
-    if (event.currentTarget.value.length >= 3) {
+    if (event.currentTarget.value.length >= COUNT_PRODUCTS_FOR_SEARCH) {
       setViewSearch(true);
       allProducts.map((product) => {
         if (product.name.toLowerCase().includes(String(event.currentTarget.value.toLowerCase())) ||
@@ -42,7 +42,7 @@ function Header(): JSX.Element {
       });
       setSearchProducts([...searchProducts, ...currentProducts]);
     }
-    if (event.currentTarget.value.length < 3) {
+    if (event.currentTarget.value.length < COUNT_PRODUCTS_FOR_SEARCH) {
       setSearchProducts([]);
       setViewSearch(false);
     }
@@ -185,7 +185,7 @@ function Header(): JSX.Element {
               />
             </label>
             {viewSearch &&
-              <ul className={`form-search__select-list ${searchProducts.length > 4 ? 'scroller' : ''}`} style={{ overflowY: 'auto' }} ref={productListRef}>
+              <ul className={`form-search__select-list ${searchProducts.length > COUNT_PRODUCTS_FOR_SCROLLER ? 'scroller' : ''}`} style={{ overflowY: 'auto' }} ref={productListRef}>
                 {searchProducts.length === 0 &&
                   <li className="form-search__select-item" tabIndex={0}>Ничего не найдено</li>}
                 {searchProducts.length !== 0 && searchProducts.map((product) => (

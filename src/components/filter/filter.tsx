@@ -1,31 +1,39 @@
-import { FILTER_CATHEGORY, FILTER_LEVEL, FILTER_TYPE } from '../../constants';
+import { FILTER_CATEGORY, FILTER_LEVEL, FILTER_TYPE, NameParameterFromURL } from '../../constants';
 import { FocusEventHandler, MouseEventHandler, useRef, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { deleteAllFilterLevels, deleteAllFilterTypes, deleteFilterLevel, deleteFilterType, setFilterCathegory, setFilterLevel, setFilterType, setPriceMax, setPriceMin } from '../../store/products-data/products-data.slice';
-import { NameCathegoryEng, NameLevelEng, NameTypeEng } from '../../types/filter';
-import { getCurrentFilterCathegory, getMaxPriceProduct, getMinPriceProduct } from '../../store/products-data/products-data.selectors';
+import { deleteAllFilterLevels, deleteAllFilterTypes, deleteFilterLevel, deleteFilterType, setFilterCategory, setFilterLevel, setFilterType, setPriceMax, setPriceMin } from '../../store/products-data/products-data.slice';
+import { NameCategoryEng, NameLevelEng, NameTypeEng } from '../../types/filter';
+import { getCurrentFilterCategory, getMaxPriceProduct, getMinPriceProduct } from '../../store/products-data/products-data.selectors';
 import { useSearchParams } from 'react-router-dom';
 
 function Filter(): JSX.Element {
   const dispatch = useAppDispatch();
-  const currentFilterCathegory = useAppSelector(getCurrentFilterCathegory);
+  const currentFilterCategory = useAppSelector(getCurrentFilterCategory);
   const [searchParams] = useSearchParams();
-  const currentPriceMinFromURL = searchParams.get('priceMin');
-  const currentPriceMaxFromURL = searchParams.get('priceMax');
-  const currentFilterCathegoryFromURL = String(searchParams.get('category'));
-  const currentFilterTypesFromURL = (String(searchParams.get('types'))).split(',');
-  const currentFilterLevelsFromURL = (String(searchParams.get('levels'))).split(',');
+  const currentPriceMinFromURL = searchParams.get(NameParameterFromURL.PriceMin);
+  const currentPriceMaxFromURL = searchParams.get(NameParameterFromURL.PriceMax);
+  const currentFilterCategoryFromURL = String(searchParams.get(NameParameterFromURL.Category));
+  const currentFilterTypesFromURL = (String(searchParams.get(NameParameterFromURL.Type))).split(',');
+  const currentFilterLevelsFromURL = (String(searchParams.get(NameParameterFromURL.Level))).split(',');
   const inputRefPrice = useRef<HTMLInputElement>(null);
   const inputRefPriceUp = useRef<HTMLInputElement>(null);
   const inputRefForm = useRef<HTMLFormElement>(null);
   const minPriceProduct = useAppSelector(getMinPriceProduct);
   const maxPriceProduct = useAppSelector(getMaxPriceProduct);
 
-  const handleFilterCathegory: MouseEventHandler<HTMLInputElement> = (event) => {
+  const handleFilterCategory: MouseEventHandler<HTMLInputElement> = (event) => {
     if (event.currentTarget.checked) {
-      dispatch(setFilterCathegory(event.currentTarget.id as NameCathegoryEng));
+      if (event.currentTarget.id === FILTER_CATEGORY[1].nameEng) {
+        if (currentFilterTypesFromURL.includes(FILTER_TYPE[2].nameEng)) {
+          dispatch(deleteFilterType(FILTER_TYPE[2].nameEng));
+        }
+        if (currentFilterTypesFromURL.includes(FILTER_TYPE[1].nameEng)) {
+          dispatch(deleteFilterType(FILTER_TYPE[1].nameEng));
+        }
+      }
+      dispatch(setFilterCategory(event.currentTarget.id as NameCategoryEng));
     } else {
-      dispatch(setFilterCathegory(null));
+      dispatch(setFilterCategory(null));
     }
   };
 
@@ -91,7 +99,7 @@ function Filter(): JSX.Element {
 
   const handleResetFilters: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    dispatch(setFilterCathegory(null));
+    dispatch(setFilterCategory(null));
     dispatch(deleteAllFilterTypes());
     dispatch(deleteAllFilterLevels());
     dispatch(setPriceMin(0));
@@ -158,16 +166,16 @@ function Filter(): JSX.Element {
           </fieldset>
           <fieldset className="catalog-filter__block">
             <legend className="title title--h5">Категория</legend>
-            {FILTER_CATHEGORY.map((filter) => (
+            {FILTER_CATEGORY.map((filter) => (
               <div className='custom-checkbox catalog-filter__item' key={filter.nameEng}>
                 <label>
                   <input
                     type="checkbox"
                     name={filter.nameEng}
-                    disabled={(filter.nameEng === 'photocamera' && currentFilterCathegory === 'videocamera') || (filter.nameEng === 'videocamera' && currentFilterCathegory === 'photocamera')}
-                    onClick={handleFilterCathegory}
+                    disabled={(filter.nameEng === 'photocamera' && currentFilterCategory === 'videocamera') || (filter.nameEng === 'videocamera' && currentFilterCategory === 'photocamera')}
+                    onClick={handleFilterCategory}
                     id={filter.nameEng}
-                    defaultChecked={currentFilterCathegoryFromURL === filter.nameEng}
+                    defaultChecked={currentFilterCategoryFromURL === filter.nameEng}
                   />
                   <span className="custom-checkbox__icon" />
                   <span className="custom-checkbox__label">
@@ -185,10 +193,11 @@ function Filter(): JSX.Element {
                   <input
                     type="checkbox"
                     name={filter.nameEng}
-                    disabled={(currentFilterCathegory === 'videocamera' && filter.nameEng === 'film') || currentFilterCathegory === 'videocamera' && filter.nameEng === 'snapshot'}
+                    disabled={(currentFilterCategory === 'videocamera' && filter.nameEng === 'film') || currentFilterCategory === 'videocamera' && filter.nameEng === 'snapshot'}
                     id={filter.nameEng}
                     onClick={handleFilterType}
-                    defaultChecked={currentFilterTypesFromURL.includes(filter.nameEng)}
+                    checked={currentFilterTypesFromURL.includes(filter.nameEng)}
+                    readOnly
                   />
                   <span className="custom-checkbox__icon" />
                   <span className="custom-checkbox__label">{filter.nameRu}</span>

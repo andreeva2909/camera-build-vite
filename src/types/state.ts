@@ -2,7 +2,7 @@ import { Product, ProductPromo } from './product';
 import { store } from '../store/index';
 import { Review } from './review';
 import { SortingDirection, SortingType } from './sorting';
-import { NameCathegoryEng } from './filter';
+import { NameCategoryEng } from './filter';
 
 export type ProductsData = {
   products: Product[];
@@ -20,7 +20,7 @@ export type ProductsData = {
   errorAddReview: boolean;
   sortingType: SortingType | null;
   sortingDirection: SortingDirection | null;
-  filterCathegory: NameCathegoryEng | null;
+  filterCategory: NameCategoryEng | null;
   filterType: string[];
   filterLevel : string[];
   priceMin: number;

@@ -4,7 +4,8 @@ import { ProductsData } from '../../types/state';
 import { fetchProductsAction, fetchProductsPromoAction, getProductDataAction, getReviewsAction, getSimilarProductsAction, postNewReviewAction } from '../api-actions';
 import { Product } from '../../types/product';
 import { SortingDirection, SortingType } from '../../types/sorting';
-import { NameCathegoryEng } from '../../types/filter';
+import { NameCategoryEng } from '../../types/filter';
+import { ParamsFromURL } from '../../types/params';
 
 const initialState: ProductsData = {
   products: [],
@@ -22,7 +23,7 @@ const initialState: ProductsData = {
   errorAddReview: false,
   sortingType: null,
   sortingDirection: null,
-  filterCathegory: null,
+  filterCategory: null,
   filterType: [],
   filterLevel : [],
   priceMin: 0,
@@ -56,8 +57,8 @@ export const productsData = createSlice({
     setSortingDirection: (state, action: PayloadAction<SortingDirection>) => {
       state.sortingDirection = action.payload;
     },
-    setFilterCathegory: (state, action: PayloadAction<NameCathegoryEng | null>) => {
-      state.filterCathegory = action.payload;
+    setFilterCategory: (state, action: PayloadAction<NameCategoryEng | null>) => {
+      state.filterCategory = action.payload;
     },
     setFilterType: (state, action: PayloadAction<string>) => {
       state.filterType.push(action.payload);
@@ -83,13 +84,13 @@ export const productsData = createSlice({
     setPriceMax: (state, action: PayloadAction<number>) => {
       state.priceMax = action.payload;
     },
-    setParamsFromURL: (state, action: PayloadAction<{priceMin: number; priceMax: number; sortingType: SortingType; sortingDirection: SortingDirection; filterCathegory: NameCathegoryEng; filterType: string[]; filterLevel: string[]}>) => {
-      const {priceMin, priceMax, sortingType, sortingDirection, filterCathegory, filterType, filterLevel} = action.payload;
+    setParamsFromURL: (state, action: PayloadAction<ParamsFromURL>) => {
+      const {priceMin, priceMax, sortingType, sortingDirection, filterCategory, filterType, filterLevel} = action.payload;
       state.priceMin = priceMin;
       state.priceMax = priceMax;
       state.sortingType = sortingType;
       state.sortingDirection = sortingDirection;
-      state.filterCathegory = filterCathegory;
+      state.filterCategory = filterCategory;
       state.filterType = filterType;
       state.filterLevel = filterLevel;
     }
@@ -149,5 +150,5 @@ export const productsData = createSlice({
   }
 });
 
-export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess, setSortingType, setSortingDirection, setFilterCathegory, setFilterType, setFilterLevel, deleteFilterType, deleteFilterLevel, setPriceMin, setPriceMax, setParamsFromURL, deleteAllFilterTypes, deleteAllFilterLevels } = productsData.actions;
+export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess, setSortingType, setSortingDirection, setFilterCategory, setFilterType, setFilterLevel, deleteFilterType, deleteFilterLevel, setPriceMin, setPriceMax, setParamsFromURL, deleteAllFilterTypes, deleteAllFilterLevels } = productsData.actions;
 export { initialState as testInitialState };

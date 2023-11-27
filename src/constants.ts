@@ -1,4 +1,4 @@
-import { FilterCathegoryType, FilterLevelType, FilterType } from './types/filter';
+import { FilterCategoryType, FilterLevelType, FilterType } from './types/filter';
 
 export enum AppRoute {
   Main = '/',
@@ -7,7 +7,7 @@ export enum AppRoute {
   Description = '/product/:id/:tab'
 }
 
-export const FILTER_CATHEGORY : FilterCathegoryType[] = [
+export const FILTER_CATEGORY : FilterCategoryType[] = [
   { nameEng: 'photocamera', nameRu: 'Фотокамера'},
   { nameEng: 'videocamera', nameRu: 'Видеокамера'},
 ];
@@ -70,4 +70,24 @@ export enum CurrentSortingDirection {
   None = 'none',
   Up = 'up',
   Down = 'down'
+}
+
+export const COUNT_PRODUCTS_FOR_SCROLLER = 4;
+
+export const COUNT_PRODUCTS_FOR_SEARCH = 3;
+
+export enum NameCategoryFromServer {
+  Photocamera = 'Фотоаппарат',
+  Videocamera = 'Видеокамера'
+}
+
+export enum NameParameterFromURL {
+  SortingType = 'sortType',
+  SortingDirection = 'sortDirection',
+  Page = 'page',
+  PriceMin = 'priceMin',
+  PriceMax = 'priceMax',
+  Category = 'category',
+  Type = 'types',
+  Level = 'levels'
 }

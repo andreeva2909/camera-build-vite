@@ -1,6 +1,7 @@
 import { SliceName } from '../../constants';
 import { makeFakeProduct, makeFakeProductPromo, makeFakeReview } from '../../test-mocks/test-mocks';
-import { getActivePopupAddItem, getActivePopupAddReview, getActivePopupAddReviewSuccess, getAllProducts, getAllProductsPromo, getErrorAddReview, getErrorProductData, getProductData, getProductReviews, getSelectedProductData, getSelectedProductId, getSimilarProducts, getStatusLoadingProductData } from './products-data.selectors';
+import { filterProductsByCategory, filterProductsByLevel, filterProductsByPrice, filterProductsByType, getMaximumPriceProduct, getMinumimumPriceProduct, sortProducts } from '../../utils';
+import { getActivePopupAddItem, getActivePopupAddReview, getActivePopupAddReviewSuccess, getAllProducts, getAllProductsPromo, getCurrentFilterCategory, getCurrentFilterLevel, getCurrentFilterType, getCurrentPriceMax, getCurrentPriceMin, getCurrentSortingDirection, getCurrentSortingType, getErrorAddReview, getErrorProductData, getFilteredProductsByCategory, getFilteredProductsByPrice, getFilteredProductsByType, getMaxPriceProduct, getMinPriceProduct, getProductData, getProductReviews, getSelectedProductData, getSelectedProductId, getSimilarProducts, getSortedProducts, getStatusLoadingProductData } from './products-data.selectors';
 import { testInitialState } from './products-data.slice';
 
 describe('Селекторы ProductsData', () => {
@@ -65,7 +66,7 @@ describe('Селекторы ProductsData', () => {
     expect(result).toEqual(productData);
   });
 
-  it('Должен получить информацию о статуса загрузки данных по товарам с сервера', () => {
+  it('Должен получить информацию о статусе загрузки данных по товарам с сервера', () => {
     const { isProductsDataLoading } = state[SliceName.Data];
     const result = getStatusLoadingProductData(state);
     expect(result).toBe(isProductsDataLoading);
@@ -95,4 +96,87 @@ describe('Селекторы ProductsData', () => {
     expect(result).toBe(errorAddReview);
   });
 
+  it('Должен получить информацию о выбранном типе сортировки', () => {
+    const { sortingType } = state[SliceName.Data];
+    const result = getCurrentSortingType(state);
+    expect(result).toBe(sortingType);
+  });
+
+  it('Должен получить информацию о выбранном направлении сортировки', () => {
+    const { sortingDirection } = state[SliceName.Data];
+    const result = getCurrentSortingDirection(state);
+    expect(result).toBe(sortingDirection);
+  });
+
+  it('Должен получить список отсортированных товаров', () => {
+    const { products, sortingType, sortingDirection } = state[SliceName.Data];
+    const result = getSortedProducts(state);
+    expect(result).toEqual(sortProducts(products, sortingType, sortingDirection));
+  });
+
+  it('Должен получить информацию о выбранном фильтре по категории', () => {
+    const { filterCategory } = state[SliceName.Data];
+    const result = getCurrentFilterCategory(state);
+    expect(result).toBe(filterCategory);
+  });
+
+  it('Должен получить информацию о выбранном фильтре по типу', () => {
+    const { filterType } = state[SliceName.Data];
+    const result = getCurrentFilterType(state);
+    expect(result).toBe(filterType);
+  });
+
+  it('Должен получить информацию о выбранном фильтре по уровню', () => {
+    const { filterLevel } = state[SliceName.Data];
+    const result = getCurrentFilterLevel(state);
+    expect(result).toBe(filterLevel);
+  });
+
+  it('Должен получить информацию о введенной пользователем минимальной стоимости товара', () => {
+    const { priceMin } = state[SliceName.Data];
+    const result = getCurrentPriceMin(state);
+    expect(result).toBe(priceMin);
+  });
+
+  it('Должен получить информацию о введенной пользователем максимальной стоимости товара', () => {
+    const { priceMax } = state[SliceName.Data];
+    const result = getCurrentPriceMax(state);
+    expect(result).toBe(priceMax);
+  });
+
+  it('Должен получить список отфильтрованныx товаров по категории', () => {
+    const { products, filterCategory } = state[SliceName.Data];
+    const result = getFilteredProductsByCategory(state);
+    expect(result).toEqual(products.slice().filter((product) => filterProductsByCategory(product, filterCategory)));
+  });
+
+  it('Должен получить список отфильтрованныx товаров по типу', () => {
+    const { products, filterType } = state[SliceName.Data];
+    const result = getFilteredProductsByType(state);
+    expect(result).toEqual(filterProductsByType(products, filterType));
+  });
+
+  it('Должен получить список отфильтрованныx товаров по уровню', () => {
+    const { products, filterLevel } = state[SliceName.Data];
+    const result = getFilteredProductsByType(state);
+    expect(result).toEqual(filterProductsByLevel(products, filterLevel));
+  });
+
+  it('Должен получить минимальную стоимость товара', () => {
+    const { products } = state[SliceName.Data];
+    const result = getMinPriceProduct(state);
+    expect(result).toEqual(getMinumimumPriceProduct(products));
+  });
+
+  it('Должен получить максимальную стоимость товара', () => {
+    const { products } = state[SliceName.Data];
+    const result = getMaxPriceProduct(state);
+    expect(result).toEqual(getMaximumPriceProduct(products));
+  });
+
+  it('Должен получить список отфильтрованныx товаров по стоимости', () => {
+    const { products, priceMin, priceMax } = state[SliceName.Data];
+    const result = getFilteredProductsByPrice(state);
+    expect(result).toEqual(products?.slice().filter((product) => filterProductsByPrice(product, priceMin, priceMax, 5000)));
+  });
 });
