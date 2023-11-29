@@ -13,7 +13,7 @@ function Header(): JSX.Element {
   const [counter, setCounter] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const productListRef = useRef<HTMLUListElement | null>(null);
-  const formRef = useRef<HTMLFormElement | null>(null);
+  const formRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -110,18 +110,13 @@ function Header(): JSX.Element {
       if (searchProducts.length === 1) {
         setCounter(0);
       }
-      if (counter <= 0) {
-        event.preventDefault();
-        focusElements[1].focus();
-        setCounter(1);
-      }
       if (counter > 0) {
         event.preventDefault();
         focusElements[counter - 1].focus();
         setCounter(counter - 1);
         if (document.activeElement === firstTabStop) {
-          focusElements[focusElements.length - 1].focus();
-          setCounter(focusElements.length - 1);
+          focusElements[0].focus();
+          setCounter(0);
         }
       }
     }
@@ -163,8 +158,8 @@ function Header(): JSX.Element {
             </li>
           </ul>
         </nav>
-        <div className={`form-search ${searchText.length > 0 ? 'list-opened' : ''}`}>
-          <form onKeyDown={handleKeyFormButton} ref={formRef}>
+        <div className={`form-search ${searchText.length > 0 ? 'list-opened' : ''}`} ref={formRef}>
+          <form onKeyDown={handleKeyFormButton}>
             <label>
               <svg
                 className="form-search__icon"
@@ -195,7 +190,7 @@ function Header(): JSX.Element {
                 ))}
               </ul>}
           </form>
-          <button className="form-search__reset" type="reset" onClick={handleResetSearchButton}>
+          <button className="form-search__reset" type="reset" onClick={handleResetSearchButton} tabIndex={0}>
             <svg width={10} height={10} aria-hidden="true">
               <use xlinkHref="#icon-close" />
             </svg>

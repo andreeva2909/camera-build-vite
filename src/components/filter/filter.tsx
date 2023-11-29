@@ -1,5 +1,5 @@
 import { FILTER_CATEGORY, FILTER_LEVEL, FILTER_TYPE, NameParameterFromURL } from '../../constants';
-import { FocusEventHandler, MouseEventHandler, useRef, useEffect } from 'react';
+import { FocusEventHandler, MouseEventHandler, useRef, useEffect, KeyboardEventHandler } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { deleteAllFilterLevels, deleteAllFilterTypes, deleteFilterLevel, deleteFilterType, setFilterCategory, setFilterLevel, setFilterType, setPriceMax, setPriceMin } from '../../store/products-data/products-data.slice';
 import { NameCategoryEng, NameLevelEng, NameTypeEng } from '../../types/filter';
@@ -85,7 +85,10 @@ function Filter(): JSX.Element {
 
   const handleBlurPriceUp: FocusEventHandler<HTMLInputElement> = (event) => {
     if (Number(event.currentTarget.value) === 0) {
-      dispatch(setPriceMax(0));
+      if (inputRefPriceUp.current?.value) {
+        dispatch(setPriceMax(Number(maxPriceProduct)));
+        inputRefPriceUp.current.value = String(maxPriceProduct);
+      }
     }
     if (Number(event.currentTarget.value) > Number(maxPriceProduct)) {
       if (inputRefPriceUp.current?.value) {
@@ -94,6 +97,41 @@ function Filter(): JSX.Element {
       }
     } else {
       dispatch(setPriceMax(Number(event.currentTarget.value)));
+    }
+  };
+
+  const handleKeyDownPrice: KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if ((event.key === 'Enter') || (event.key === 'Ent')) {
+      if (Number(event.currentTarget.value) === 0) {
+        dispatch(setPriceMin(0));
+      }
+      if (Number(event.currentTarget.value) < Number(minPriceProduct)) {
+        if (inputRefPrice.current?.value) {
+          inputRefPrice.current.value = String(minPriceProduct);
+          dispatch(setPriceMin(Number(minPriceProduct)));
+        }
+      } else {
+        dispatch(setPriceMin(Number(event.currentTarget.value)));
+      }
+    }
+  };
+
+  const handleKeyDownPriceUp: KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if ((event.key === 'Enter') || (event.key === 'Ent')) {
+      if (Number(event.currentTarget.value) === 0) {
+        if (inputRefPriceUp.current?.value) {
+          dispatch(setPriceMax(Number(maxPriceProduct)));
+          inputRefPriceUp.current.value = String(maxPriceProduct);
+        }
+      }
+      if (Number(event.currentTarget.value) > Number(maxPriceProduct)) {
+        if (inputRefPriceUp.current?.value) {
+          inputRefPriceUp.current.value = String(maxPriceProduct);
+          dispatch(setPriceMax(Number(maxPriceProduct)));
+        }
+      } else {
+        dispatch(setPriceMax(Number(event.currentTarget.value)));
+      }
     }
   };
 
@@ -143,6 +181,7 @@ function Filter(): JSX.Element {
                     name="price"
                     onInput={handleInputPrice}
                     onBlur={handleBlurPrice}
+                    onKeyDown={handleKeyDownPrice}
                     ref={inputRefPrice}
                     placeholder={String(minPriceProduct) !== 'undefined' ? String(minPriceProduct) : 'от'}
                     defaultValue={String(currentPriceMinFromURL)}
@@ -156,6 +195,7 @@ function Filter(): JSX.Element {
                     name="priceUp"
                     onInput={handleInputPriceUp}
                     onBlur={handleBlurPriceUp}
+                    onKeyDown={handleKeyDownPriceUp}
                     ref={inputRefPriceUp}
                     placeholder={String(maxPriceProduct) !== 'undefined' ? String(maxPriceProduct) : 'до'}
                     defaultValue={String(currentPriceMaxFromURL)}
