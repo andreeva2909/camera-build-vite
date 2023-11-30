@@ -4,7 +4,8 @@ export enum AppRoute {
   Main = '/',
   Product = '/product',
   Characteristics = '/product/:id/:tab',
-  Description = '/product/:id/:tab'
+  Description = '/product/:id/:tab',
+  Basket = '/basket'
 }
 
 export const FILTER_CATEGORY : FilterCategoryType[] = [

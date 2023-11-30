@@ -34,3 +34,5 @@ export const getFilteredProductsByLevel = createSelector([getFilteredProductsByT
 export const getMinPriceProduct = createSelector([getFilteredProductsByLevel], (products) => getMinumimumPriceProduct(products));
 export const getMaxPriceProduct = createSelector([getFilteredProductsByLevel], (products) => getMaximumPriceProduct(products));
 export const getFilteredProductsByPrice = createSelector([getFilteredProductsByLevel, getCurrentPriceMin, getCurrentPriceMax, getMaxPriceProduct], (products, currentPriceMin, currentPriceMax, priceMax) => products?.slice().filter((product) => filterProductsByPrice(product, currentPriceMin, currentPriceMax, Number(priceMax))));
+export const getActivePopupAddProductToBasketSuccess = (state: Pick<State, SliceName.Data>): boolean => state[SliceName.Data].isActivePopupAddProductToBasketSuccess;
+export const getProductsInBasket = (state: Pick<State, SliceName.Data>): Product[] => state[SliceName.Data].productsInBasket;

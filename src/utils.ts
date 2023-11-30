@@ -145,7 +145,10 @@ function filterProductsByPrice(product: Product, currentPriceMin: number, curren
     return product.price >= currentPriceMin && product.price <= priceMax;
   }
   return product.price >= currentPriceMin && product.price <= currentPriceMax;
-
 }
 
-export { sortReviews, scrollWindow, sortProducts, filterProductsByCategory, filterProductsByType, filterProductsByLevel, getMinumimumPriceProduct, getMaximumPriceProduct, filterProductsByPrice };
+function checkProductInBasket(productId: string, productsInBasket: Product[]) {
+  return productsInBasket.some((product) => String(product.id) === String(productId));
+}
+
+export { sortReviews, scrollWindow, sortProducts, filterProductsByCategory, filterProductsByType, filterProductsByLevel, getMinumimumPriceProduct, getMaximumPriceProduct, filterProductsByPrice, checkProductInBasket };

@@ -11,6 +11,7 @@ export type ProductsData = {
   isActivePopupAddItem: boolean;
   isActivePopupAddReview: boolean;
   isActivePopupAddReviewSuccess: boolean;
+  isActivePopupAddProductToBasketSuccess: boolean;
   selectedProductId: string;
   selectedProductData: Product;
   productData: Product;
@@ -25,6 +26,7 @@ export type ProductsData = {
   filterLevel : string[];
   priceMin: number;
   priceMax: number;
+  productsInBasket: Product[];
 }
 
 export type State = ReturnType<typeof store.getState>;

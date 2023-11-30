@@ -1,13 +1,14 @@
 import { MouseEventHandler } from 'react';
-import { setPopupAddItem } from '../../store/products-data/products-data.slice';
+import { addProductToBasket, setPopupAddItem, setPopupAddProductToBasketSuccess } from '../../store/products-data/products-data.slice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getSelectedProductData } from '../../store/products-data/products-data.selectors';
+import { getSelectedProductData, getSelectedProductId } from '../../store/products-data/products-data.selectors';
 import useScroll from '../../hooks/use-scroll';
 
 function PopupAddItem(): JSX.Element {
   const dispatch = useAppDispatch();
   const { showScroll, hideScroll } = useScroll();
   const selectedProductData = useAppSelector(getSelectedProductData);
+  const selectedProductId = useAppSelector(getSelectedProductId);
   hideScroll();
 
   const handleCloseButton: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (event) => {
@@ -21,6 +22,13 @@ function PopupAddItem(): JSX.Element {
       dispatch(setPopupAddItem(false));
       showScroll();
     }
+  };
+
+  const handleAddToBasket: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    dispatch(setPopupAddItem(false));
+    dispatch(setPopupAddProductToBasketSuccess(true));
+    dispatch(addProductToBasket(selectedProductId));
   };
 
   return (
@@ -65,6 +73,7 @@ function PopupAddItem(): JSX.Element {
               className="btn btn--purple modal__btn modal__btn--fit-width"
               type="button"
               autoFocus
+              onClick={handleAddToBasket}
             >
               <svg width={24} height={16} aria-hidden="true">
                 <use xlinkHref="#icon-add-basket" />

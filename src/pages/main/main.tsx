@@ -3,7 +3,7 @@ import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import Sorting from '../../components/sorting/sorting';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getActivePopupAddItem, getAllProducts, getCurrentFilterCategory, getCurrentFilterLevel, getCurrentFilterType, getCurrentPriceMax, getCurrentPriceMin, getCurrentSortingDirection, getCurrentSortingType, getFilteredProductsByCategory, getFilteredProductsByLevel, getFilteredProductsByPrice, getFilteredProductsByType, getSortedProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
+import { getActivePopupAddItem, getActivePopupAddProductToBasketSuccess, getAllProducts, getCurrentFilterCategory, getCurrentFilterLevel, getCurrentFilterType, getCurrentPriceMax, getCurrentPriceMin, getCurrentSortingDirection, getCurrentSortingType, getFilteredProductsByCategory, getFilteredProductsByLevel, getFilteredProductsByPrice, getFilteredProductsByType, getSortedProducts, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import ProductCardList from '../../components/product-card-list/product-card-list';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MouseEventHandler, useState, useEffect } from 'react';
@@ -19,6 +19,7 @@ import { setParamsFromURL } from '../../store/products-data/products-data.slice'
 import { SortingDirection, SortingType } from '../../types/sorting';
 import { NameCategoryEng } from '../../types/filter';
 import { Params } from '../../types/params';
+import PopupAddProductToBasketSuccess from '../../components/popup-add-product-to-basket-success/popup-add-product-to-basket-success';
 
 function MainPage(): JSX.Element {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ function MainPage(): JSX.Element {
     arrayPages.push(i);
   }
   const activePopupAddItem = useAppSelector(getActivePopupAddItem);
+  const activePopupAddProductToBasket = useAppSelector(getActivePopupAddProductToBasketSuccess);
   const isProductDataLoading = useAppSelector(getStatusLoadingProductData);
 
   useEffect(() => {
@@ -227,6 +229,7 @@ function MainPage(): JSX.Element {
           </section>
         </div>
         {activePopupAddItem === true && <PopupAddItem />}
+        {activePopupAddProductToBasket === true && <PopupAddProductToBasketSuccess />}
       </main>
       <Footer />
     </div>

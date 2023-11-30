@@ -2,8 +2,10 @@ import { MouseEventHandler } from 'react';
 import { AppRoute, RATINGS, Tab } from '../../constants';
 import { Product } from '../../types/product';
 import { selectProductId, setPopupAddItem } from '../../store/products-data/products-data.slice';
-import { useAppDispatch } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { Link } from 'react-router-dom';
+import { getProductsInBasket } from '../../store/products-data/products-data.selectors';
+import { checkProductInBasket } from '../../utils';
 
 type ProductCardProps = {
   product: Product;
@@ -12,6 +14,7 @@ type ProductCardProps = {
 
 function ProductCard({ product, style }: ProductCardProps): JSX.Element {
   const dispatch = useAppDispatch();
+  const productsInBasket = useAppSelector(getProductsInBasket);
 
   const handleBuyButton: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
@@ -56,14 +59,24 @@ function ProductCard({ product, style }: ProductCardProps): JSX.Element {
         </p>
       </div>
       <div className="product-card__buttons">
-        <button
-          className="btn btn--purple product-card__btn"
-          type="button"
-          id={String(product.id)}
-          onClick={handleBuyButton}
-        >
-          Купить
-        </button>
+        {!checkProductInBasket(String(product.id), productsInBasket) &&
+          <button
+            className="btn btn--purple product-card__btn"
+            type="button"
+            id={String(product.id)}
+            onClick={handleBuyButton}
+          >
+            Купить
+          </button>}
+        {checkProductInBasket(String(product.id), productsInBasket) &&
+          <a
+            className="btn btn--purple-border product-card__btn product-card__btn--in-cart"
+          >
+            <svg width={16} height={16} aria-hidden="true">
+              <use xlinkHref="#icon-basket" />
+            </svg>
+            В корзине
+          </a>}
         <Link className="btn btn--transparent" to={`${AppRoute.Product}/${product.id}/${Tab.Characteristics}`}>
           Подробнее
         </Link>

@@ -35,6 +35,12 @@ function Breadcrumbs(): JSX.Element {
                 {productData.name}
               </span>
             </li>}
+          {pathname.includes(AppRoute.Basket) &&
+            <li className="breadcrumbs__item">
+              <span className="breadcrumbs__link breadcrumbs__link--active">
+                Корзина
+              </span>
+            </li>}
         </ul>
       </div>
     </div>
