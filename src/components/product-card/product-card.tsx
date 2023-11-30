@@ -5,7 +5,7 @@ import { selectProductId, setPopupAddItem } from '../../store/products-data/prod
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { Link } from 'react-router-dom';
 import { getProductsInBasket } from '../../store/products-data/products-data.selectors';
-import { checkProductInBasket } from '../../utils';
+import { checkProductInBasket, scrollWindow } from '../../utils';
 
 type ProductCardProps = {
   product: Product;
@@ -20,6 +20,12 @@ function ProductCard({ product, style }: ProductCardProps): JSX.Element {
     event.preventDefault();
     dispatch(setPopupAddItem(true));
     dispatch(selectProductId(event.currentTarget.id));
+  };
+
+  const handleBasketButton: MouseEventHandler<HTMLElement> = () => {
+    scrollWindow({
+      top: 0
+    });
   };
 
   return (
@@ -72,6 +78,7 @@ function ProductCard({ product, style }: ProductCardProps): JSX.Element {
           <Link
             to={AppRoute.Basket}
             className="btn btn--purple-border product-card__btn product-card__btn--in-cart"
+            onClick={handleBasketButton}
           >
             <svg width={16} height={16} aria-hidden="true">
               <use xlinkHref="#icon-basket" />
