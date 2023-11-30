@@ -69,14 +69,15 @@ function ProductCard({ product, style }: ProductCardProps): JSX.Element {
             Купить
           </button>}
         {checkProductInBasket(String(product.id), productsInBasket) &&
-          <a
+          <Link
+            to={AppRoute.Basket}
             className="btn btn--purple-border product-card__btn product-card__btn--in-cart"
           >
             <svg width={16} height={16} aria-hidden="true">
               <use xlinkHref="#icon-basket" />
             </svg>
             В корзине
-          </a>}
+          </Link>}
         <Link className="btn btn--transparent" to={`${AppRoute.Product}/${product.id}/${Tab.Characteristics}`}>
           Подробнее
         </Link>
