@@ -28,8 +28,7 @@ const initialState: ProductsData = {
   filterType: [],
   filterLevel : [],
   priceMin: 0,
-  priceMax: 0,
-  productsInBasket: []
+  priceMax: 0
 };
 
 export const productsData = createSlice({
@@ -98,14 +97,7 @@ export const productsData = createSlice({
       state.filterCategory = filterCategory;
       state.filterType = filterType;
       state.filterLevel = filterLevel;
-    },
-    addProductToBasket: (state, action: PayloadAction<string>) => {
-      state.products.map((product) => {
-        if (product.id === Number(action.payload)) {
-          state.productsInBasket.push(product);
-        }
-      });
-    },
+    }
   },
   extraReducers(builder) {
     builder
@@ -162,5 +154,5 @@ export const productsData = createSlice({
   }
 });
 
-export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess, setSortingType, setSortingDirection, setFilterCategory, setFilterType, setFilterLevel, deleteFilterType, deleteFilterLevel, setPriceMin, setPriceMax, setParamsFromURL, deleteAllFilterTypes, deleteAllFilterLevels, setPopupAddProductToBasketSuccess, addProductToBasket } = productsData.actions;
+export const { setPopupAddItem, setPopupAddReview, selectProductId, setPopupAddReviewSuccess, setSortingType, setSortingDirection, setFilterCategory, setFilterType, setFilterLevel, deleteFilterType, deleteFilterLevel, setPriceMin, setPriceMax, setParamsFromURL, deleteAllFilterTypes, deleteAllFilterLevels, setPopupAddProductToBasketSuccess } = productsData.actions;
 export { initialState as testInitialState };

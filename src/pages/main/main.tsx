@@ -20,6 +20,7 @@ import { SortingDirection, SortingType } from '../../types/sorting';
 import { NameCategoryEng } from '../../types/filter';
 import { Params } from '../../types/params';
 import PopupAddProductToBasketSuccess from '../../components/popup-add-product-to-basket-success/popup-add-product-to-basket-success';
+import useScroll from '../../hooks/use-scroll';
 
 function MainPage(): JSX.Element {
   const navigate = useNavigate();
@@ -40,6 +41,8 @@ function MainPage(): JSX.Element {
   const currentFilterCategory = useAppSelector(getCurrentFilterCategory);
   const currentFilterType = useAppSelector(getCurrentFilterType);
   const currentFilterLevel = useAppSelector(getCurrentFilterLevel);
+  const { showScroll } = useScroll();
+  showScroll();
 
   let currentListPages = 0;
   if (currentPageNumberFromURL < COUNT_PAGES_FOR_ONE_PAGE) {

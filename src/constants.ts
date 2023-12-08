@@ -28,13 +28,16 @@ export const FILTER_LEVEL : FilterLevelType[] = [
 
 export enum SliceName {
   Data = 'Data',
+  Basket = 'Basket'
 }
 
 export enum APIRoute {
   Cameras = '/cameras',
   Promo = '/promo',
   Similar = '/similar',
-  Reviews = '/reviews'
+  Reviews = '/reviews',
+  Coupons = '/coupons',
+  Orders = '/orders'
 }
 
 export const RATINGS = [1, 2, 3, 4, 5];
@@ -92,3 +95,8 @@ export enum NameParameterFromURL {
   Type = 'types',
   Level = 'levels'
 }
+
+export const MIN_COUNT_PRODUCTS = 1;
+
+export const MAX_COUNT_PRODUCTS = 99;
+

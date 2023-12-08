@@ -4,6 +4,7 @@ import { ChangeEventHandler, MouseEventHandler, useState, useRef } from 'react';
 import { useAppSelector } from '../../hooks';
 import { getAllProducts } from '../../store/products-data/products-data.selectors';
 import { Product } from '../../types/product';
+import { getProductsInBasket } from '../../store/basket-data/basket-data.selectors';
 
 function Header(): JSX.Element {
   const allProducts = useAppSelector(getAllProducts);
@@ -15,6 +16,8 @@ function Header(): JSX.Element {
   const productListRef = useRef<HTMLUListElement | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const productsInBasket = useAppSelector(getProductsInBasket);
+  const countProductsInBasket = productsInBasket.slice().reduce((previousValue, currentValue) => previousValue + Number(currentValue.count), 0);
 
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (event) => {
     event.preventDefault();
@@ -201,6 +204,7 @@ function Header(): JSX.Element {
           <svg width={16} height={16} aria-hidden="true">
             <use xlinkHref="#icon-basket" />
           </svg>
+          {productsInBasket.length !== 0 && <span className="header__basket-count">{countProductsInBasket}</span>}
         </Link>
       </div>
     </header>

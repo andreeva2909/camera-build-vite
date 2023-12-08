@@ -2,7 +2,7 @@ import { useEffect, MouseEventHandler } from 'react';
 import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getActivePopupAddReview, getActivePopupAddReviewSuccess, getErrorProductData, getProductData, getProductReviews, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
+import { getActivePopupAddItem, getActivePopupAddProductToBasketSuccess, getActivePopupAddReview, getActivePopupAddReviewSuccess, getErrorProductData, getProductData, getProductReviews, getStatusLoadingProductData } from '../../store/products-data/products-data.selectors';
 import { AppRoute, RATINGS, Tab } from '../../constants';
 import Breadcrumbs from '../../components/breadcrumbs/breadcrumbs';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -14,6 +14,9 @@ import PopupAddReview from '../../components/popup-add-review/popup-add-review';
 import PopupAddReviewSuccess from '../../components/popup-add-review-success/popup-add-review-success';
 import Loader from '../../components/loader/loader';
 import { scrollWindow } from '../../utils';
+import { selectProductId, setPopupAddItem } from '../../store/products-data/products-data.slice';
+import PopupAddItem from '../../components/popup-add-item/popup-add-item';
+import PopupAddProductToBasketSuccess from '../../components/popup-add-product-to-basket-success/popup-add-product-to-basket-success';
 
 function ProductPage(): JSX.Element {
   const { id, tab } = useParams();
@@ -26,6 +29,8 @@ function ProductPage(): JSX.Element {
   const isActivePopupAddReview = useAppSelector(getActivePopupAddReview);
   const isActivePopupAddReviewSuccess = useAppSelector(getActivePopupAddReviewSuccess);
   const isProductDataLoading = useAppSelector(getStatusLoadingProductData);
+  const activePopupAddItem = useAppSelector(getActivePopupAddItem);
+  const activePopupAddProductToBasket = useAppSelector(getActivePopupAddProductToBasketSuccess);
 
   const handleUpButton: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
@@ -33,6 +38,12 @@ function ProductPage(): JSX.Element {
       top: 0,
       behavior: 'smooth'
     });
+  };
+
+  const handleAddToBasketButton: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    dispatch(selectProductId(event.currentTarget.id));
+    dispatch(setPopupAddItem(true));
   };
 
   useEffect(() => {
@@ -46,6 +57,7 @@ function ProductPage(): JSX.Element {
       dispatch(getProductDataAction(id));
       dispatch(getSimilarProductsAction(id));
       dispatch(getReviewsAction(id));
+      dispatch(selectProductId(String(id)));
     }
     scrollWindow({
       top: 0
@@ -102,7 +114,7 @@ function ProductPage(): JSX.Element {
                   <p className="product__price">
                     <span className="visually-hidden">Цена:</span>{productData.price?.toLocaleString()} ₽
                   </p>
-                  <button className="btn btn--purple" type="button">
+                  <button className="btn btn--purple" type="button" id={String(productData.id)} onClick={handleAddToBasketButton}>
                     <svg width={24} height={16} aria-hidden="true">
                       <use xlinkHref="#icon-add-basket" />
                     </svg>
@@ -156,6 +168,8 @@ function ProductPage(): JSX.Element {
         </div>
         {isActivePopupAddReview && <PopupAddReview />}
         {isActivePopupAddReviewSuccess && <PopupAddReviewSuccess />}
+        {activePopupAddItem === true && <PopupAddItem />}
+        {activePopupAddProductToBasket === true && <PopupAddProductToBasketSuccess />}
       </main>
       <button className="up-btn" onClick={handleUpButton}>
         <svg width={12} height={18} aria-hidden="true">

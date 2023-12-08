@@ -5,6 +5,7 @@ import { AppRoute, TIME_TO_RENDER_PAGE } from '../../constants';
 import { render, screen } from '@testing-library/react';
 import App from './app';
 import { testInitialState } from '../../store/products-data/products-data.slice';
+import { testInitialStateBasket } from '../../store/basket-data/basket-data.slice';
 window.scrollTo = vi.fn().mockImplementation(() => null);
 describe('Application Routing', () => {
   let mockHistory: MemoryHistory;
@@ -15,7 +16,16 @@ describe('Application Routing', () => {
 
   it('should render "MainPage" when user navigate to "/"', () => {
     const withHistoryComponent = withHistory(<App />, mockHistory);
-    const { withStoreComponent } = withStore(withHistoryComponent, makeFakeStore());
+    const { withStoreComponent } = withStore(
+      withHistoryComponent,
+      makeFakeStore({
+        Data: {
+          ...testInitialState
+        },
+        Basket: {
+          ...testInitialStateBasket
+        }
+      }));
     mockHistory.push(AppRoute.Main);
 
     render(withStoreComponent);
@@ -33,8 +43,14 @@ describe('Application Routing', () => {
     const withHistoryComponent = withHistory(<App />, mockHistory);
     const { withStoreComponent } = withStore(
       withHistoryComponent,
-      makeFakeStore()
-    );
+      makeFakeStore({
+        Data: {
+          ...testInitialState
+        },
+        Basket: {
+          ...testInitialStateBasket
+        }
+      }));
     mockHistory.push(unknownRoute);
 
     render(withStoreComponent);
@@ -54,7 +70,10 @@ describe('Application Routing', () => {
       makeFakeStore({
         Data: {
           ...testInitialState,
-          productData: productData,
+          productData: productData
+        },
+        Basket: {
+          ...testInitialStateBasket
         }
       }));
     mockHistory.push(AppRoute.Characteristics);

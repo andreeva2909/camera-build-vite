@@ -4,6 +4,7 @@ import { makeFakeProduct, makeFakeReview, makeFakeStore } from '../../test-mocks
 import { TIME_TO_RENDER_PAGE } from '../../constants';
 import { createMemoryHistory } from 'history';
 import { testInitialState } from '../../store/products-data/products-data.slice';
+import { testInitialStateBasket } from '../../store/basket-data/basket-data.slice';
 import ProductPage from './product';
 window.scrollTo = vi.fn().mockImplementation(() => null);
 describe('Component: ProductPage', () => {
@@ -21,6 +22,9 @@ describe('Component: ProductPage', () => {
         productData: mockProduct,
         similarProducts: mockSimilarProducts,
         productReviews: mockReviews
+      },
+      Basket: {
+        ...testInitialStateBasket
       }
     }));
   it('should render correctly', () => {

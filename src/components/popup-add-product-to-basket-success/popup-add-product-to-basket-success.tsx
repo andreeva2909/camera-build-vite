@@ -1,4 +1,4 @@
-import { MouseEventHandler } from 'react';
+import { MouseEventHandler, useEffect, useRef } from 'react';
 import { useAppDispatch } from '../../hooks';
 import useScroll from '../../hooks/use-scroll';
 import { setPopupAddProductToBasketSuccess } from '../../store/products-data/products-data.slice';
@@ -9,10 +9,17 @@ import { scrollWindow } from '../../utils';
 function PopupAddProductToBasketSuccess(): JSX.Element {
   const dispatch = useAppDispatch();
   const { showScroll, hideScroll } = useScroll();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const pathname = location.pathname;
   hideScroll();
 
   const handleCloseButton: MouseEventHandler<HTMLButtonElement | HTMLDivElement | HTMLElement> = (event) => {
     event.preventDefault();
+    dispatch(setPopupAddProductToBasketSuccess(false));
+    showScroll();
+  };
+
+  const handleReturnToCatalogButton: MouseEventHandler<HTMLElement> = () => {
     dispatch(setPopupAddProductToBasketSuccess(false));
     showScroll();
   };
@@ -32,8 +39,12 @@ function PopupAddProductToBasketSuccess(): JSX.Element {
     });
   };
 
+  useEffect(() => {
+    modalRef.current?.focus();
+  });
+
   return (
-    <div className="modal is-active modal--narrow" onKeyDown={handleKeyButton}>
+    <div className="modal is-active modal--narrow" onKeyDown={handleKeyButton} autoFocus tabIndex={0} ref={modalRef} data-testid='popup_add_product_to_basket_success'>
       <div className="modal__wrapper">
         <div className="modal__overlay" onClick={handleCloseButton} />
         <div className="modal__content">
@@ -42,9 +53,14 @@ function PopupAddProductToBasketSuccess(): JSX.Element {
             <use xlinkHref="#icon-success" />
           </svg>
           <div className="modal__buttons">
-            <a className="btn btn--transparent modal__btn" href="#" onClick={handleCloseButton}>
-              Продолжить покупки
-            </a>
+            {!pathname.includes(AppRoute.Product) &&
+              <a className="btn btn--transparent modal__btn" href="#" tabIndex={0} autoFocus onClick={handleCloseButton}>
+                Продолжить покупки
+              </a>}
+            {pathname.includes(AppRoute.Product) &&
+              <Link to={`${AppRoute.Main}?page=1`} className="btn btn--transparent modal__btn" tabIndex={0} autoFocus onClick={handleReturnToCatalogButton}>
+                Продолжить покупки
+              </Link>}
             <Link to={AppRoute.Basket} className="btn btn--purple modal__btn modal__btn--fit-width" onClick={handleBasketButton}>
               Перейти в корзину
             </Link>

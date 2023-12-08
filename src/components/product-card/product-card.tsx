@@ -4,8 +4,8 @@ import { Product } from '../../types/product';
 import { selectProductId, setPopupAddItem } from '../../store/products-data/products-data.slice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { Link } from 'react-router-dom';
-import { getProductsInBasket } from '../../store/products-data/products-data.selectors';
 import { checkProductInBasket, scrollWindow } from '../../utils';
+import { getProductsInBasket } from '../../store/basket-data/basket-data.selectors';
 
 type ProductCardProps = {
   product: Product;

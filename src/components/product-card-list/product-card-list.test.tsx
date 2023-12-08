@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { withHistory, withStore } from '../../test-mocks/test-component';
 import { testInitialState } from '../../store/products-data/products-data.slice';
+import { testInitialStateBasket } from '../../store/basket-data/basket-data.slice';
 import { makeFakeProduct } from '../../test-mocks/test-mocks';
 import { TIME_TO_RENDER_PAGE } from '../../constants';
 import ProductCardList from './product-card-list';
@@ -15,6 +16,9 @@ describe('Component: ReviewsList', () => {
       Data: {
         ...testInitialState,
         products: mockProducts
+      },
+      Basket: {
+        ...testInitialStateBasket
       }
     });
     const preparedComponent = withHistory(withStoreComponent);

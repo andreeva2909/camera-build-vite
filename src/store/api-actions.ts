@@ -5,6 +5,7 @@ import { APIRoute } from '../constants';
 import { AppDispatch, State } from '../types/state.ts';
 import { Review } from '../types/review.ts';
 import { FieldValues } from 'react-hook-form';
+import { Order, PromoCode } from '../types/basket.ts';
 
 export const fetchProductsAction = createAsyncThunk<Product[], undefined, {
   dispatch: AppDispatch;
@@ -77,4 +78,28 @@ export const postNewReviewAction = createAsyncThunk<Review, FieldValues, {
     const { data } = response;
     return data;
   },
+);
+
+export const postCouponAction = createAsyncThunk<number, PromoCode, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'basket/postCoupon',
+  async (coupon, {extra: api}) => {
+    const {data} = await api.post<number>(APIRoute.Coupons, {coupon});
+    return data;
+  }
+);
+
+export const postOrderAction = createAsyncThunk<number, Order, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'order/postOrder',
+  async (param, {extra: api}) => {
+    const {data} = await api.post<number>(APIRoute.Orders, param);
+    return data;
+  }
 );

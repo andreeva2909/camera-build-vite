@@ -5,6 +5,8 @@ import { Action, ThunkDispatch } from '@reduxjs/toolkit';
 import { State } from '../types/state';
 import { createAPI } from '../services/api';
 import { testInitialState } from '../store/products-data/products-data.slice';
+import { testInitialStateBasket } from '../store/basket-data/basket-data.slice';
+import { ProductInBasket } from '../types/basket';
 
 export const makeFakeProduct = (): Product => ({
   id: 4,
@@ -62,5 +64,27 @@ export const makeFakeStore = (initialState?: Partial<State>): State => ({
   Data: {
     ...testInitialState
   },
+  Basket: {
+    ...testInitialStateBasket
+  },
   ...initialState ?? {}
 });
+
+export const makeFakeProductInBasket = (): ProductInBasket => ({
+  id: 4,
+  count: 1,
+  name: faker.lorem.word(),
+  vendorCode: faker.lorem.word(),
+  type: 'Цифровая',
+  category: 'Фотоаппарат',
+  description: faker.lorem.words(5),
+  level: 'Нулевой',
+  price: faker.datatype.number(20000),
+  rating: faker.datatype.number({ min: 1, max: 5 }),
+  reviewCount: faker.datatype.number(20),
+  previewImg: faker.image.city(),
+  previewImg2x: faker.image.city(),
+  previewImgWebp: faker.image.city(),
+  previewImgWebp2x: faker.image.city(),
+} as ProductInBasket);
+

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import Header from './header';
 import { withHistory, withStore } from '../../test-mocks/test-component';
 import { testInitialState } from '../../store/products-data/products-data.slice';
+import { testInitialStateBasket } from '../../store/basket-data/basket-data.slice';
 
 describe('Component: Header', () => {
   it('should render correctly', () => {
@@ -9,6 +10,9 @@ describe('Component: Header', () => {
     const { withStoreComponent } = withStore(<Header />, {
       Data: {
         ...testInitialState
+      },
+      Basket: {
+        ...testInitialStateBasket
       }
     });
     const preparedComponent = withHistory(withStoreComponent);

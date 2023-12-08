@@ -5,8 +5,9 @@ import thunk from 'redux-thunk';
 import { AppThunkDispatch, extractActionTypes, makeFakeProduct, makeFakeProductPromo, makeFakeReview, makeFakeUserReview } from '../test-mocks/test-mocks';
 import { Action } from '@reduxjs/toolkit';
 import { APIRoute } from '../constants';
-import { fetchProductsAction, fetchProductsPromoAction, getProductDataAction, getReviewsAction, getSimilarProductsAction, postNewReviewAction } from './api-actions';
+import { fetchProductsAction, fetchProductsPromoAction, getProductDataAction, getReviewsAction, getSimilarProductsAction, postCouponAction, postNewReviewAction, postOrderAction } from './api-actions';
 import { State } from '../types/state';
+import { Order } from '../types/basket';
 
 describe('Асинхронные операции', () => {
   const axios = createAPI();
@@ -233,4 +234,81 @@ describe('Асинхронные операции', () => {
       ]);
     });
   });
+
+  describe('postCouponAction', () => {
+    const mockCoupon = 'camera-444';
+
+    it('Проверяем ответ при коде ответа сервера 200', async () => {
+
+      mockAxiosAdapter.onPost(APIRoute.Coupons)
+        .reply(200, mockCoupon);
+
+      await store.dispatch(postCouponAction(mockCoupon));
+
+      const emittedActions = store.getActions();
+      const extractedActionTypes = extractActionTypes(emittedActions);
+      const postCouponActionFulfilled = emittedActions[1] as ReturnType<typeof postCouponAction.fulfilled>;
+
+      expect(extractedActionTypes).toEqual([
+        postCouponAction.pending.type,
+        postCouponAction.fulfilled.type
+      ]);
+
+      expect(postCouponActionFulfilled.payload).toEqual(mockCoupon);
+    });
+
+    it('Проверяем ответ при коде ответа сервера 400', async () => {
+      mockAxiosAdapter.onPost(APIRoute.Coupons).reply(400, []);
+
+      await store.dispatch(postCouponAction(mockCoupon));
+
+      const actions = extractActionTypes(store.getActions());
+
+      expect(actions).toEqual([
+        postCouponAction.pending.type,
+        postCouponAction.rejected.type
+      ]);
+    });
+  });
+
+  describe('postOrderAction', () => {
+    const mockOrder = {
+      camerasIds: [1],
+      coupon: 'camera-444'
+    } as Order;
+
+    it('Проверяем ответ при коде ответа сервера 200', async () => {
+
+      mockAxiosAdapter.onPost(APIRoute.Orders)
+        .reply(200, mockOrder);
+
+      await store.dispatch(postOrderAction(mockOrder));
+
+      const emittedActions = store.getActions();
+      const extractedActionTypes = extractActionTypes(emittedActions);
+      const postCouponActionFulfilled = emittedActions[1] as ReturnType<typeof postOrderAction.fulfilled>;
+
+      expect(extractedActionTypes).toEqual([
+        postOrderAction.pending.type,
+        postOrderAction.fulfilled.type
+      ]);
+
+      expect(postCouponActionFulfilled.payload).toEqual(mockOrder);
+    });
+
+    it('Проверяем ответ при коде ответа сервера 400', async () => {
+      mockAxiosAdapter.onPost(APIRoute.Orders).reply(400, []);
+
+      await store.dispatch(postOrderAction(mockOrder));
+
+      const actions = extractActionTypes(store.getActions());
+
+      expect(actions).toEqual([
+        postOrderAction.pending.type,
+        postOrderAction.rejected.type
+      ]);
+    });
+  });
 });
+
+

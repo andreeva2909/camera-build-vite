@@ -1,4 +1,5 @@
 import { CurrentSortingType, CurrentSortingDirection, FILTER_CATEGORY, FILTER_TYPE, FILTER_LEVEL, NameCategoryFromServer } from './constants';
+import { ProductInBasket, PromoCode } from './types/basket';
 import { Product } from './types/product';
 import { Review } from './types/review';
 import { SortingDirection, SortingType } from './types/sorting';
@@ -151,4 +152,31 @@ function checkProductInBasket(productId: string, productsInBasket: Product[]) {
   return productsInBasket.some((product) => String(product.id) === String(productId));
 }
 
-export { sortReviews, scrollWindow, sortProducts, filterProductsByCategory, filterProductsByType, filterProductsByLevel, getMinumimumPriceProduct, getMaximumPriceProduct, filterProductsByPrice, checkProductInBasket };
+function getProductsInBasket () {
+  const data = localStorage.getItem('products');
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const products = data ? JSON.parse(data) : [];
+  return {
+    productsFromLS: products as ProductInBasket[]
+  };
+}
+
+function getPromoCode () {
+  const data = localStorage.getItem('promocode');
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const promoCode = data ? JSON.parse(data) : null;
+  return {
+    promoCode: promoCode as PromoCode
+  };
+}
+
+function getDiscount () {
+  const data = localStorage.getItem('discount');
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const discount = data ? JSON.parse(data) : null;
+  return {
+    discount: discount as number
+  };
+}
+
+export { sortReviews, scrollWindow, sortProducts, filterProductsByCategory, filterProductsByType, filterProductsByLevel, getMinumimumPriceProduct, getMaximumPriceProduct, filterProductsByPrice, checkProductInBasket, getProductsInBasket, getPromoCode, getDiscount };

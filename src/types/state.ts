@@ -3,6 +3,7 @@ import { store } from '../store/index';
 import { Review } from './review';
 import { SortingDirection, SortingType } from './sorting';
 import { NameCategoryEng } from './filter';
+import { ProductInBasket, PromoCode } from './basket';
 
 export type ProductsData = {
   products: Product[];
@@ -26,7 +27,18 @@ export type ProductsData = {
   filterLevel : string[];
   priceMin: number;
   priceMax: number;
-  productsInBasket: Product[];
+}
+
+export type BasketData = {
+  productsInBasket: ProductInBasket[];
+  deletingProductData: ProductInBasket;
+  isActivePopupDeleteProduct: boolean;
+  promoCode: PromoCode;
+  promoError: boolean;
+  isValidPromoCode: boolean;
+  discount: number;
+  orderError: boolean;
+  isActivePopupOrder: boolean;
 }
 
 export type State = ReturnType<typeof store.getState>;

@@ -1,14 +1,21 @@
 import { MouseEventHandler } from 'react';
-import { addProductToBasket, setPopupAddItem, setPopupAddProductToBasketSuccess } from '../../store/products-data/products-data.slice';
+import { setPopupAddItem, setPopupAddProductToBasketSuccess } from '../../store/products-data/products-data.slice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getSelectedProductData, getSelectedProductId } from '../../store/products-data/products-data.selectors';
+import { getProductData, getSelectedProductData } from '../../store/products-data/products-data.selectors';
 import useScroll from '../../hooks/use-scroll';
+import { AppRoute } from '../../constants';
+import { addProductToBasket } from '../../store/basket-data/basket-data.slice';
 
 function PopupAddItem(): JSX.Element {
   const dispatch = useAppDispatch();
   const { showScroll, hideScroll } = useScroll();
-  const selectedProductData = useAppSelector(getSelectedProductData);
-  const selectedProductId = useAppSelector(getSelectedProductId);
+  const pathname = location.pathname;
+  let selectedProductData = useAppSelector(getSelectedProductData);
+  const productData = useAppSelector(getProductData);
+
+  if (pathname.includes(AppRoute.Product)) {
+    selectedProductData = productData;
+  }
   hideScroll();
 
   const handleCloseButton: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (event) => {
@@ -24,11 +31,10 @@ function PopupAddItem(): JSX.Element {
     }
   };
 
-  const handleAddToBasket: MouseEventHandler<HTMLButtonElement> = (event) => {
-    event.preventDefault();
+  const handleAddToBasket: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(setPopupAddItem(false));
     dispatch(setPopupAddProductToBasketSuccess(true));
-    dispatch(addProductToBasket(selectedProductId));
+    dispatch(addProductToBasket(selectedProductData));
   };
 
   return (
@@ -64,7 +70,7 @@ function PopupAddItem(): JSX.Element {
                 <li className="basket-item__list-item">{selectedProductData.level} уровень</li>
               </ul>
               <p className="basket-item__price">
-                <span className="visually-hidden">Цена:</span>{selectedProductData.price.toLocaleString()} ₽
+                <span className="visually-hidden">Цена:</span>{selectedProductData.price?.toLocaleString()} ₽
               </p>
             </div>
           </div>
