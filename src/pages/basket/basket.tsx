@@ -8,7 +8,6 @@ import { decreaseCountProduct, increaseCountProduct, setActivePopupDeleteProduct
 import { AppRoute, MAX_COUNT_PRODUCTS, MIN_COUNT_PRODUCTS } from '../../constants';
 import PopupDeleteProductFromBasket from '../../components/popup-delete-product-from-basket/popup-delete-product-from-basket';
 import { Link } from 'react-router-dom';
-import { PromoCode } from '../../types/basket';
 import { postCouponAction, postOrderAction } from '../../store/api-actions';
 import classNames from 'classnames';
 import PopupOrderSuccess from '../../components/popup-order-success/popup-order-success';
@@ -62,8 +61,8 @@ function BasketPage(): JSX.Element {
   const handleKeyDownApplyPromocode: KeyboardEventHandler<HTMLInputElement> = (event) => {
     if ((event.key === 'Enter') || (event.key === 'Ent') && (event.currentTarget.value.length > 0)) {
       if (inputRef.current?.value) {
-        dispatch(setPromoCode(String(inputRef.current?.value) as PromoCode));
-        dispatch(postCouponAction(String(inputRef.current?.value) as PromoCode));
+        dispatch(setPromoCode(inputRef.current?.value));
+        dispatch(postCouponAction(inputRef.current?.value));
       }
     }
   };
@@ -71,8 +70,8 @@ function BasketPage(): JSX.Element {
   const handleApplyPromocode: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
     if (inputRef.current?.value) {
-      dispatch(setPromoCode(String(inputRef.current?.value) as PromoCode));
-      dispatch(postCouponAction(String(inputRef.current?.value) as PromoCode));
+      dispatch(setPromoCode(inputRef.current?.value));
+      dispatch(postCouponAction(inputRef.current?.value));
     }
   };
 

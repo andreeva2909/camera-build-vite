@@ -18,7 +18,7 @@ export type ProductInBasket = {
   previewImgWebp2x: string;
 }
 
-export type PromoCode = 'camera-333' | 'camera-444' | 'camera-555' | '';
+export type PromoCode = string;
 
 export type Order = {
   camerasIds: [number];
