@@ -38,6 +38,8 @@ function BasketPage(): JSX.Element {
       dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: MIN_COUNT_PRODUCTS }));
     } else if (Number(event.currentTarget.value) > MAX_COUNT_PRODUCTS) {
       dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: MAX_COUNT_PRODUCTS }));
+    } else if ((event.currentTarget.value).split(',')[1] || (event.currentTarget.value).split('.')[1]) {
+      dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: Math.round(Number(event.currentTarget.value)) }));
     } else {
       dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: Number(event.currentTarget.value) }));
     }
@@ -48,6 +50,8 @@ function BasketPage(): JSX.Element {
       dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: MIN_COUNT_PRODUCTS }));
     } else if (Number(event.currentTarget.value) > MAX_COUNT_PRODUCTS) {
       dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: MAX_COUNT_PRODUCTS }));
+    } else if ((event.currentTarget.value).split(',')[1] || (event.currentTarget.value).split('.')[1]) {
+      dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: Math.round(Number(event.currentTarget.value)) }));
     } else {
       dispatch(setCountProduct({ id: Number(event.currentTarget.id), count: Number(event.currentTarget.value) }));
     }
@@ -59,7 +63,7 @@ function BasketPage(): JSX.Element {
   };
 
   const handleKeyDownApplyPromocode: KeyboardEventHandler<HTMLInputElement> = (event) => {
-    if ((event.key === 'Enter') || (event.key === 'Ent') && (event.currentTarget.value.length > 0)) {
+    if ((event.key === 'Enter') || (event.key === 'Ent')) {
       if (inputRef.current?.value) {
         dispatch(setPromoCode(inputRef.current?.value));
         dispatch(postCouponAction(inputRef.current?.value));
@@ -69,7 +73,7 @@ function BasketPage(): JSX.Element {
 
   const handleApplyPromocode: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    if (inputRef.current?.value) {
+    if (inputRef.current?.value || inputRef.current?.value === '') {
       dispatch(setPromoCode(inputRef.current?.value));
       dispatch(postCouponAction(inputRef.current?.value));
     }
@@ -79,7 +83,12 @@ function BasketPage(): JSX.Element {
     event.preventDefault();
     const camerasIds = [] as unknown as [number];
     productsInBasket.slice().map((product) => camerasIds.push(product.id));
-    dispatch(postOrderAction({camerasIds: camerasIds, coupon: promoCode}));
+    if (discount === null || discount === 0 || promoCode === null) {
+      dispatch(setPromoCode(null));
+      dispatch(postOrderAction({camerasIds: camerasIds, coupon: null}));
+    } else {
+      dispatch(postOrderAction({camerasIds: camerasIds, coupon: promoCode}));
+    }
     setTimeout(() => dispatch(setActivePopupOrder(true)), 1000);
   };
 

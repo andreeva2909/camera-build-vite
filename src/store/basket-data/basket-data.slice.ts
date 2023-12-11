@@ -97,6 +97,7 @@ export const basketData = createSlice({
       })
       .addCase(postOrderAction.fulfilled, (state) => {
         state.orderError = false;
+        state.promoError = false;
         state.isValidPromoCode = false;
         state.promoCode = '';
         state.discount = 0;

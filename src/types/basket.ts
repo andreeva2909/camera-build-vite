@@ -18,9 +18,9 @@ export type ProductInBasket = {
   previewImgWebp2x: string;
 }
 
-export type PromoCode = string;
+export type PromoCode = string | null;
 
 export type Order = {
   camerasIds: [number];
-  coupon: string;
+  coupon: string | null;
 }
